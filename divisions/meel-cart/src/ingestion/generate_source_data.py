@@ -253,15 +253,50 @@ def generate_orders_items_payments_shipments(
     )
 
 
+
+# ---- Stable schemas (used when a file is empty) ----
+SCHEMA_COLUMNS = {
+    "customers": ["customer_id","created_at","updated_at","first_name","last_name","email","phone","city","state","country","customer_segment"],
+    "products": ["product_id","created_at","updated_at","product_name","category","brand","base_price","active_flag"],
+    "orders": ["order_id","created_at","updated_at","customer_id","order_status","order_channel","currency","shipping_city","shipping_state","shipping_country"],
+    "order_items": ["order_item_id","order_id","product_id","quantity","unit_price","line_amount","created_at"],
+    "payments": ["payment_id","order_id","created_at","updated_at","payment_status","payment_method","amount","currency","provider"],
+    "shipments": ["shipment_id","order_id","created_at","updated_at","carrier","shipping_status","shipped_at","delivered_at","estimated_delivery_date"],
+}
+
+def _read_csv_safe(p: Path, table_name: str):
+    """
+    Read CSV safely.
+    If file is empty (0 bytes) or has no parseable columns, return empty df with expected columns.
+    """
+    import pandas as pd
+    if not p.exists():
+        return None
+    if p.stat().st_size == 0:
+        return pd.DataFrame(columns=SCHEMA_COLUMNS.get(table_name, []))
+    try:
+        df = pd.read_csv(p)
+        # If columns are missing for any reason, force schema
+        if df.shape[1] == 0:
+            return pd.DataFrame(columns=SCHEMA_COLUMNS.get(table_name, []))
+        return df
+    except pd.errors.EmptyDataError:
+        return pd.DataFrame(columns=SCHEMA_COLUMNS.get(table_name, []))
+
+
+
 def _read_prev_day(prev_dir: Path) -> Optional[Dict[str, pd.DataFrame]]:
     if not prev_dir.exists():
         return None
-    tables = {}
+    tables: Dict[str, pd.DataFrame] = {}
     for name in ["customers", "products", "orders", "order_items", "payments", "shipments"]:
         p = prev_dir / f"{name}.csv"
-        if p.exists():
-            tables[name] = pd.read_csv(p)
+        df = _read_csv_safe(p, name)
+        if df is not None:
+            tables[name] = df
     return tables if tables else None
+
+
 
 
 def _apply_late_updates(run_date: date, cfg: VolumeConfig, prev: Dict[str, pd.DataFrame]) -> Dict[str, pd.DataFrame]:

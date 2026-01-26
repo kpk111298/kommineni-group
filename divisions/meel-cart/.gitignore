@@ -211,3 +211,10 @@ data/source/day=*/
 
 # Local DuckDB warehouse (keep local)
 warehouse/*.duckdb
+# macOS junk
+.DS_Store
+
+# Local Meel Cart dashboard launcher (keep local only)
+MeelCart_Dashboard
+run_dashboard.command
+

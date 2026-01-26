@@ -16,11 +16,21 @@ def _now_ts() -> str:
     return datetime.now().strftime("%Y-%m-%d %H:%M:%S")
 
 
+def _read_csv_safe(path: Path) -> pd.DataFrame:
+    """
+    Read CSV safely.
+    - If file is empty (0 bytes), return empty df.
+    - If file exists but has no rows, still return empty df with columns if present.
+    """
+    if path.stat().st_size == 0:
+        return pd.DataFrame()
+    try:
+        return pd.read_csv(path)
+    except pd.errors.EmptyDataError:
+        return pd.DataFrame()
+
+
 def load_day_to_bronze(run_date: str, db_path: str = "warehouse/ecomm.duckdb") -> Dict[str, int]:
-    """
-    Append source CSVs for a given day into bronze_* tables.
-    Bronze is append-only and keeps raw-ish data + ingestion metadata.
-    """
     day_dir = Path("data/source") / f"day={run_date}"
     if not day_dir.exists():
         raise SystemExit(f"Source folder not found: {day_dir}")
@@ -38,20 +48,27 @@ def load_day_to_bronze(run_date: str, db_path: str = "warehouse/ecomm.duckdb") -
         if not csv_path.exists():
             raise SystemExit(f"Missing source file: {csv_path}")
 
-        df = pd.read_csv(csv_path)
+        df = _read_csv_safe(csv_path)
+
+        table_name = f"bronze_{t}"
+
+        # Ensure table exists (derive schema from bronze if already exists; else derive from file if non-empty)
+        con.execute(f"""
+            CREATE TABLE IF NOT EXISTS {table_name} AS
+            SELECT * FROM read_csv_auto('{csv_path.as_posix()}') WHERE 1=0;
+        """)
+
+        # If empty file / no rows, just record 0 and continue
+        if df.empty:
+            results[t] = 0
+            continue
 
         # Add ingestion metadata
         df["batch_date"] = run_date
         df["ingested_at"] = ingested_at
         df["source_file"] = str(csv_path)
 
-        table_name = f"bronze_{t}"
-
-        # Create table if not exists (schema inferred from df)
         con.register("df_tmp", df)
-        con.execute(f"CREATE TABLE IF NOT EXISTS {table_name} AS SELECT * FROM df_tmp WHERE 1=0;")
-
-        # Append rows
         con.execute(f"INSERT INTO {table_name} SELECT * FROM df_tmp;")
 
         results[t] = len(df)
