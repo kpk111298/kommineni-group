@@ -208,3 +208,6 @@ __marimo__/
 
 # Generated daily source data (keep local)
 data/source/day=*/
+
+# Local DuckDB warehouse (keep local)
+warehouse/*.duckdb
