@@ -17,3 +17,7 @@ Build an end-to-end e-commerce analytics system that supports incremental loads 
 - Bronze is immutable to support audit and replay
 - Silver is the “truth layer” with standardized schema and incremental merge logic
 - Gold is shaped for analytics (facts/dims) and KPI reporting
+
+## Backfill Range (Local)
+For this portfolio project, the local backfill used for dashboard realism starts from **2026-01-05** through the latest generated date.
+This avoids partial replays during development while keeping the pipeline behavior realistic (daily incremental loads + late updates).
