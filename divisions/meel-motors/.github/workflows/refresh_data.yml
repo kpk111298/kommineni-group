@@ -1,0 +1,34 @@
+name: Daily Data Refresh
+
+on:
+  schedule:
+    - cron: '0 8 * * *'
+  workflow_dispatch:
+
+jobs:
+  refresh:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v3
+
+      - uses: actions/setup-python@v4
+        with:
+          python-version: '3.11'
+
+      - run: pip install faker pandas duckdb dbt-core dbt-duckdb
+
+      - run: python data_generator/generate_data.py
+
+      - run: python ingestion/ingest_bronze.py
+
+      - run: |
+          cd dbt_project/kommineni_automotive
+          dbt run --profiles-dir .
+
+      - run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add kommineni_automotive.duckdb data/raw/
+          git diff --staged --quiet || git commit -m "chore: Auto refresh data $(date +%Y-%m-%d)"
+          git push
