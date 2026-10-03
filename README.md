@@ -37,6 +37,7 @@ Control Room (pick the day or a scenario) â†’ source systems run the business â†
 - [Scenarios](docs/scenarios.md)
 - [Engineering standards](docs/engineering-standards.md)
 - [Tool map: local, AWS, Azure](docs/tool-map.md)
+- [Website](docs/website.md), live at group.pkomm.com
 
 ## The problems
 
@@ -58,6 +59,8 @@ kommineni-group/
   problems/      one folder per problem: ticket, solution, tests, write-up
   docs/          company story, standards, tool map
   brand/         logos for the group and every division
+  site/          the company website, published at group.pkomm.com
+  tools/         the script that builds the website
 ```
 
 ## Free tools used
