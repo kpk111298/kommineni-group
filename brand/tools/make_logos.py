@@ -1,72 +1,67 @@
+"""Draws the Kommineni Group logos: a fine double-ring seal plus a serif wordmark."""
 import os
 from fontTools.ttLib import TTFont
 from fontTools.pens.svgPathPen import SVGPathPen
 from fontTools.pens.transformPen import TransformPen
 
-FONTS = {w: TTFont(f"fonts/jost-latin-{w}-normal.woff2") for w in (400, 500)}
-OUT = ".."
+FONT_DIR = os.environ.get("FONT_DIR", "fonts")
+OUT = os.environ.get("OUT", "..")
+SERIF = TTFont(f"{FONT_DIR}/cormorant-garamond-latin-500-normal.woff2")
+SERIF_BOLD = TTFont(f"{FONT_DIR}/cormorant-garamond-latin-600-normal.woff2")
+SANS = TTFont(f"{FONT_DIR}/jost-latin-400-normal.woff2")
 
-NAVY, GOLD = "#0A0D16", "#D9C08A"
-GOLD_ON_LIGHT = "#8A7344"
-INK, PAPER = "#0A0D16", "#FFFFFF"
+NAVY, IVORY = "#0A0D16", "#F4F1EA"
+GOLD, GOLD_TEXT = "#C9AE72", "#8A7344"
 
 ENTITIES = {
-    "kommineni-group": ("KOMMINENI GROUP", None, NAVY),
-    "meel-motors": ("MEEL MOTORS", "Car dealership", "#A63A2B"),
-    "meel-cart": ("MEEL CART", "Online store", "#A85F0C"),
-    "meel-care": ("MEEL CARE", "Clinics and health plan", "#2F7A55"),
-    "meel-move": ("MEEL MOVE", "Logistics", "#1F5FA8"),
-    "meel-pay": ("MEEL PAY", "Loans and payments", "#4C3FA0"),
-    "meel-reach": ("MEEL REACH", "Marketing", "#B23A68"),
-    "kommineni-hq": ("KOMMINENI HQ", "HR, finance, support", "#3A3F4B"),
+    "kommineni-group": ("KOMMINENI GROUP", "ILLINOIS · EST. 2026", GOLD),
+    "meel-motors": ("MEEL MOTORS", "A KOMMINENI GROUP COMPANY", "#7A2E2A"),
+    "meel-cart": ("MEEL CART", "A KOMMINENI GROUP COMPANY", "#8C5A1E"),
+    "meel-care": ("MEEL CARE", "A KOMMINENI GROUP COMPANY", "#2F5D46"),
+    "meel-move": ("MEEL MOVE", "A KOMMINENI GROUP COMPANY", "#2A4A73"),
+    "meel-pay": ("MEEL PAY", "A KOMMINENI GROUP COMPANY", "#4E3A6B"),
+    "meel-reach": ("MEEL REACH", "A KOMMINENI GROUP COMPANY", "#8A3A52"),
+    "kommineni-hq": ("KOMMINENI HQ", "A KOMMINENI GROUP COMPANY", "#4A4F58"),
 }
 
-S = 'fill="none" stroke="{c}" stroke-width="9" stroke-linecap="round" stroke-linejoin="round"'
+LINE = 'fill="none" stroke="{c}" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"'
 GLYPHS = {
-    "kommineni-group": '<path {s} d="M43 30 V90 M80 30 L44 64 M58 51 L82 90"/>',
-    "meel-motors": '<circle {s} cx="68" cy="60" r="24"/><circle fill="{c}" cx="68" cy="60" r="6"/>'
-                   '<path {s} d="M20 50 H34 M14 64 H32 M24 78 H38"/>',
-    "meel-cart": '<path {s} d="M33 50 H87 L82 90 H38 Z M48 50 V44 A12 12 0 0 1 72 44 V50"/>',
-    "meel-care": '<path fill="none" stroke="{c}" stroke-width="16" stroke-linecap="round" d="M60 34 V86 M34 60 H86"/>',
-    "meel-move": '<path {s} d="M36 36 L58 60 L36 84 M62 36 L84 60 L62 84"/>',
-    "meel-pay": '<rect {s} x="28" y="36" width="64" height="48" rx="9"/><path {s} d="M28 53 H92 M40 70 H56"/>',
-    "meel-reach": '<circle fill="{c}" cx="60" cy="60" r="8"/>'
-                  '<path {s} d="M45 45 A21 21 0 0 0 45 75 M75 45 A21 21 0 0 1 75 75 M33 33 A38 38 0 0 0 33 87 M87 33 A38 38 0 0 1 87 87"/>',
-    "kommineni-hq": '<path {s} d="M32 46 L60 30 L88 46 Z M44 54 V82 M60 54 V82 M76 54 V82 M30 90 H90"/>',
+    "meel-motors": '<circle {l} cx="60" cy="60" r="22"/><circle {l} cx="60" cy="60" r="5"/>'
+                   '<path {l} d="M60 65 V82 M55.5 58 L39 52 M64.5 58 L81 52"/>',
+    "meel-cart": '<path {l} d="M44 52 H76 L73 82 H47 Z M52 52 V47 A8 8 0 0 1 68 47 V52"/>',
+    "meel-care": '<path {l} d="M55 41 H65 V55 H79 V65 H65 V79 H55 V65 H41 V55 H55 Z"/>',
+    "meel-move": '<path {l} d="M38 60 H81 M71 50 L81 60 L71 70 M38 52 V68"/>',
+    "meel-pay": '<path {l} d="M48 44 H72 L82 56 L60 82 L38 56 Z M38 56 H82 M53 44 L50 56 L60 82 L70 56 L67 44"/>',
+    "meel-reach": '<path {l} d="M60 37 L64.5 55.5 L83 60 L64.5 64.5 L60 83 L55.5 64.5 L37 60 L55.5 55.5 Z"/>',
+    "kommineni-hq": '<path {l} d="M40 50 L60 38 L80 50 Z M46 55 V76 M55 55 V76 M65 55 V76 M74 55 V76 M38 81 H82"/>',
 }
 
 
-def text_path(text, size, weight, x, y, tracking, fill):
-    font = FONTS[weight]
+def text_path(font, text, size, x, y, tracking, fill, center=False):
     gs, cmap = font.getGlyphSet(), font.getBestCmap()
-    upm = font["head"].unitsPerEm
-    scale = size / upm
-    parts, cx = [], x
-    for ch in text:
-        name = cmap.get(ord(ch))
-        adv = font["hmtx"][name][0]
+    scale = size / font["head"].unitsPerEm
+    advances = [font["hmtx"][cmap[ord(ch)]][0] * scale for ch in text]
+    width = sum(advances) + tracking * size * (len(text) - 1)
+    cx = x - width / 2 if center else x
+    parts = []
+    for ch, adv in zip(text, advances):
         pen = SVGPathPen(gs)
-        gs[name].draw(TransformPen(pen, (scale, 0, 0, -scale, cx, y)))
-        d = pen.getCommands()
-        if d:
-            parts.append(d)
-        cx += adv * scale + tracking * size
-    width = cx - x - tracking * size
+        gs[cmap[ord(ch)]].draw(TransformPen(pen, (scale, 0, 0, -scale, cx, y)))
+        if pen.getCommands():
+            parts.append(pen.getCommands())
+        cx += adv + tracking * size
     return f'<path fill="{fill}" d="{" ".join(parts)}"/>', width
 
 
-def tile(key, color, ox=0, oy=0):
-    uid = f"{key}-{ox}-{oy}"
-    tile_fill = NAVY if key == "kommineni-group" else color
-    glyph_color = GOLD if key == "kommineni-group" else "#FFFFFF"
-    out = f'<g transform="translate({ox} {oy})"><clipPath id="t-{uid}"><rect width="120" height="120" rx="26"/></clipPath>'
-    out += f'<rect width="120" height="120" rx="26" fill="{tile_fill}"/>'
+def seal(key, accent, dark):
+    ring = GOLD if dark else accent
+    ink = GOLD if dark else accent
+    out = (f'<circle fill="none" stroke="{ring}" stroke-width="1.25" cx="60" cy="60" r="56"/>'
+           f'<circle fill="none" stroke="{ring}" stroke-width="0.6" cx="60" cy="60" r="51"/>')
     if key == "kommineni-group":
-        out += f'<rect x="1.5" y="1.5" width="117" height="117" rx="24.5" fill="none" stroke="{GOLD}" stroke-opacity="0.55" stroke-width="3"/>'
-    if key != "kommineni-group":
-        out += f'<polygon clip-path="url(#t-{uid})" points="92,0 120,0 120,28" fill="{GOLD}"/>'
-    out += GLYPHS[key].replace("{s}", S).replace("{c}", glyph_color) + "</g>"
-    return out
+        k, _ = text_path(SERIF_BOLD, "K", 62, 60, 81, 0, IVORY if dark else NAVY, center=True)
+        return out + k
+    return out + GLYPHS[key].replace("{l}", LINE).replace("{c}", ink)
 
 
 def svg(w, h, body, title):
@@ -74,22 +69,21 @@ def svg(w, h, body, title):
             f'role="img" aria-label="{title}"><title>{title}</title>{body}</svg>\n')
 
 
-def lockup(key, name, color, dark):
-    ink = PAPER if dark else INK
-    sub = GOLD if dark else GOLD_ON_LIGHT
-    word, ww = text_path(name, 40, 500, 148, 66, 0.14, ink)
-    line = "A KOMMINENI GROUP COMPANY" if key != "kommineni-group" else "DATA ENGINEERING SHOWCASE"
-    tag, tw = text_path(line, 13, 400, 149, 96, 0.22, sub)
-    w = 148 + max(ww, tw) + 8
+def lockup(key, name, line, accent, dark):
+    word, ww = text_path(SERIF, name, 36, 146, 66, 0.16, IVORY if dark else NAVY)
+    rule = f'<path stroke="{GOLD}" stroke-width="0.8" d="M147 79.5 H{147 + 28}"/>'
+    tag, tw = text_path(SANS, line, 10.5, 147, 98, 0.3, GOLD if dark else GOLD_TEXT)
+    w = 146 + max(ww, tw) + 12
     bg = f'<rect width="{w:.0f}" height="120" fill="{NAVY}"/>' if dark else ""
-    return svg(w, 120, bg + tile(key, color) + word + tag, f"{name.title()} logo")
+    return svg(w, 120, bg + seal(key, accent, dark) + word + rule + tag, f"{name.title()} logo")
 
 
-os.makedirs(OUT, exist_ok=True)
-for key, (name, _, color) in ENTITIES.items():
+for key, (name, line, accent) in ENTITIES.items():
     d = os.path.join(OUT, key)
     os.makedirs(d, exist_ok=True)
-    open(f"{d}/mark.svg", "w").write(svg(120, 120, tile(key, color), f"{name.title()} mark"))
-    open(f"{d}/lockup-light.svg", "w").write(lockup(key, name, color, False))
-    open(f"{d}/lockup-dark.svg", "w").write(lockup(key, name, color, True))
+    open(f"{d}/mark.svg", "w").write(svg(120, 120, seal(key, accent, False), f"{name.title()} seal"))
+    open(f"{d}/mark-dark.svg", "w").write(
+        svg(120, 120, f'<rect width="120" height="120" rx="60" fill="{NAVY}"/>' + seal(key, accent, True), f"{name.title()} seal"))
+    open(f"{d}/lockup-light.svg", "w").write(lockup(key, name, line, accent, False))
+    open(f"{d}/lockup-dark.svg", "w").write(lockup(key, name, line, accent, True))
 print("done")
