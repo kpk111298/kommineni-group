@@ -7,3 +7,4 @@ venv/
 target/
 dbt_packages/
 logs/
+brand/tools/fonts/
