@@ -29,7 +29,7 @@ All divisions share one customer list, one employee list, one calendar, one set 
 
 ## How it works
 
-Control Room (pick the day or a scenario) → source systems run the business → pipelines → dashboards and pkomm.com/group → ticket, fix, write-up → next problem.
+Control Room (pick the day or a scenario) → source systems run the business → pipelines → dashboards → ticket, fix, blog post → next problem.
 
 - [The company](docs/company.md)
 - [Source systems](docs/source-systems.md)
@@ -37,7 +37,6 @@ Control Room (pick the day or a scenario) → source systems run the business �
 - [Scenarios](docs/scenarios.md)
 - [Engineering standards](docs/engineering-standards.md)
 - [Tool map: local, AWS, Azure](docs/tool-map.md)
-- [Website](docs/website.md), live at pkomm.com/group
 
 ## The problems
 
@@ -59,9 +58,6 @@ kommineni-group/
   problems/      one folder per problem: ticket, solution, tests, write-up
   docs/          company story, standards, tool map
   brand/         logos for the group and every division
-  site-src/      website styles and fonts
-  site/          the built website, published at pkomm.com/group
-  tools/         the script that builds the website
 ```
 
 ## Free tools used

@@ -47,8 +47,8 @@ These live in `shared/` and every division uses them:
 1. **The Control Room** (private Streamlit app behind Cloudflare Access) sets each day: normal, or a scenario like Black Friday. See [scenarios.md](scenarios.md).
 2. **Source systems** run the business and write data the way real software does. See [source-systems.md](source-systems.md).
 3. **Pipelines** load bronze, silver and gold, with tests at every step.
-4. **Dashboards and pkomm.com/group** show the business the results.
-5. **Tickets** come in as GitHub Issues when something looks wrong. Each one gets fixed, tested and written up on pkomm.com.
+4. **Dashboards** show the business the results.
+5. **Tickets** come in as GitHub Issues when something looks wrong. Each one gets fixed, tested and written up as a blog post on pkomm.com/blog.
 
 Engineering practices are in [engineering-standards.md](engineering-standards.md).
 

@@ -48,4 +48,4 @@ Code makes the rows. AI makes the messy text that code can't fake well: doctor n
 
 ## Honesty
 
-Inside the company, everything uses business names. Every README and every page of pkomm.com/group says clearly: Kommineni Group is a simulated company built by Prameel Kommineni as a data engineering showcase.
+Inside the company, everything uses business names. Every README and every blog post says clearly: Kommineni Group is a simulated company built by Prameel Kommineni as a data engineering showcase.
