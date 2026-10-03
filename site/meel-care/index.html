@@ -1,0 +1,93 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Meel Care | Kommineni Group</title>
+<meta name="description" content="Meel Care: Outpatient clinics and a small health plan. A Kommineni Group business.">
+<link rel="canonical" href="https://group.pkomm.com/meel-care/">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="Kommineni Group">
+<meta property="og:title" content="Meel Care | Kommineni Group">
+<meta property="og:description" content="Meel Care: Outpatient clinics and a small health plan. A Kommineni Group business.">
+<meta property="og:url" content="https://group.pkomm.com/meel-care/">
+<meta property="og:image" content="https://group.pkomm.com/assets/og.png">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="theme-color" content="#0A0D16">
+<link rel="icon" href="/assets/favicon.svg" type="image/svg+xml">
+<link rel="apple-touch-icon" href="/assets/apple-touch-icon.png">
+<link rel="preload" href="/assets/fonts/cormorant-garamond-latin-500-normal.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="stylesheet" href="/assets/site.css">
+</head>
+<body>
+<a class="skip" href="#main">Skip to content</a>
+<header class="site-head">
+  <div class="wrap">
+    <a class="brand" href="/"><img src="/assets/brand/kommineni-group.svg" alt="" width="40" height="40"><span>Kommineni Group</span></a>
+    <button class="nav-toggle" aria-expanded="false" aria-controls="nav">Menu</button>
+    <nav class="nav" id="nav" aria-label="Main"><a href="/#businesses">Businesses</a><a href="/engineering/">Engineering</a><a href="/about/">How it works</a><a href="https://pkomm.com">Prameel Kommineni</a></nav>
+  </div>
+</header>
+<main id="main">
+
+<section class="biz-hero" style="--accent: #2F5D46">
+  <div class="wrap">
+    <img src="/assets/brand/meel-care.svg" alt="" width="148" height="148">
+    <div>
+      <p class="kicker">Clinics and health plan, a Kommineni Group business</p>
+      <h1>Meel Care</h1>
+      <p class="lede">Meel Care will run clinics and an insurance plan, with patients created by Synthea, the open source patient simulator.</p>
+      
+    </div>
+  </div>
+</section>
+
+<section class="section" style="--accent: #2F5D46">
+  <div class="wrap facts">
+    <div>
+      <h2>How it runs</h2>
+      <p>An electronic health record for visits, labs and prescriptions, plus a claims system.</p>
+      <ul class="tables" aria-label="Data it creates"><li>Patients</li><li>Visits</li><li>Lab results</li><li>Prescriptions</li><li>Claims</li></ul>
+    </div>
+    <div>
+      <h2>What makes its data hard</h2>
+      <ul><li>Hospital records arrive as deeply nested FHIR files.</li><li>Patient details must be stripped before analysts see the data.</li><li>Claims get adjusted weeks after the visit.</li><li>The same patient registers at three clinics under three spellings.</li></ul>
+    </div>
+    <div>
+      <h2>Status</h2>
+      <p class="planned"><strong>Opening later.</strong> Meel Care is planned. Its systems and first problems are on the <a href="/engineering/">engineering roadmap</a>.</p>
+    </div>
+  </div>
+</section>
+
+
+</main>
+<footer class="site-foot">
+  <div class="wrap">
+    <div>
+      <img src="/assets/brand/kommineni-group-lockup-dark.svg" alt="Kommineni Group" width="280" height="64">
+      <p>Kommineni Group is a simulated company. The businesses, customers and numbers are made up. The engineering is real: every pipeline, test and fix is built by <a href="https://pkomm.com">Prameel Kommineni</a>.</p>
+    </div>
+    <ul>
+      <li><a href="/#businesses">Our businesses</a></li>
+      <li><a href="/engineering/">Engineering problems</a></li>
+      <li><a href="/about/">How it works</a></li>
+      <li><a href="https://github.com/kpk111298/kommineni-group">Code on GitHub</a></li>
+      <li><a href="https://pkomm.com">Prameel Kommineni</a></li>
+    </ul>
+    <p class="small">Copyright 2026 Prameel Kommineni. All rights reserved.</p>
+  </div>
+</footer>
+<script>
+  (function () {
+    var b = document.querySelector('.nav-toggle'), n = document.getElementById('nav');
+    if (!b) return;
+    b.addEventListener('click', function () {
+      var open = n.classList.toggle('open');
+      b.setAttribute('aria-expanded', open ? 'true' : 'false');
+      b.textContent = open ? 'Close' : 'Menu';
+    });
+  })();
+</script>
+</body>
+</html>

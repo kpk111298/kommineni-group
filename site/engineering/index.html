@@ -1,0 +1,82 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Engineering problems | Kommineni Group</title>
+<meta name="description" content="Real data engineering problems from Kommineni Group, solved with free tools and written up.">
+<link rel="canonical" href="https://group.pkomm.com/engineering/">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="Kommineni Group">
+<meta property="og:title" content="Engineering problems | Kommineni Group">
+<meta property="og:description" content="Real data engineering problems from Kommineni Group, solved with free tools and written up.">
+<meta property="og:url" content="https://group.pkomm.com/engineering/">
+<meta property="og:image" content="https://group.pkomm.com/assets/og.png">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="theme-color" content="#0A0D16">
+<link rel="icon" href="/assets/favicon.svg" type="image/svg+xml">
+<link rel="apple-touch-icon" href="/assets/apple-touch-icon.png">
+<link rel="preload" href="/assets/fonts/cormorant-garamond-latin-500-normal.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="stylesheet" href="/assets/site.css">
+</head>
+<body>
+<a class="skip" href="#main">Skip to content</a>
+<header class="site-head">
+  <div class="wrap">
+    <a class="brand" href="/"><img src="/assets/brand/kommineni-group.svg" alt="" width="40" height="40"><span>Kommineni Group</span></a>
+    <button class="nav-toggle" aria-expanded="false" aria-controls="nav">Menu</button>
+    <nav class="nav" id="nav" aria-label="Main"><a href="/#businesses">Businesses</a><a href="/engineering/" aria-current="page">Engineering</a><a href="/about/">How it works</a><a href="https://pkomm.com">Prameel Kommineni</a></nav>
+  </div>
+</header>
+<main id="main">
+
+<section class="hero">
+  <div class="wrap" style="display:block">
+    <h1>Engineering problems</h1>
+    <p class="lede">Real data engineering problems, from first-year mistakes to the kind top companies hire for.
+    Each one is fixed with free tools that run on a laptop, with a short note on how the same fix looks on AWS and Azure.</p>
+  </div>
+</section>
+<section class="section">
+  <div class="wrap">
+    <div class="section-head"><h2>Logged so far</h2><p>Each one links to its ticket, code and tests on GitHub.</p></div>
+    <table class="ledger"><thead><tr><th>No.</th><th>Problem</th><th>Business</th><th>Area</th><th>Status</th></tr></thead><tbody><tr><td class="num">001</td><td class="what"><a href="https://github.com/kpk111298/kommineni-group/tree/main/problems/001-history-rewrites-itself">Yesterday&#x27;s sales changed overnight</a><span>The dealership&#x27;s history rewrites itself every morning.</span></td><td class="meta"><a href="/meel-motors/">Meel Motors</a></td><td class="meta">Incremental loading</td><td class="meta">Open</td></tr><tr><td class="num">002</td><td class="what"><a href="https://github.com/kpk111298/kommineni-group/tree/main/problems/002-database-in-git">The repo that grows every day</a><span>A daily job saves the whole database into git.</span></td><td class="meta"><a href="/meel-motors/">Meel Motors</a></td><td class="meta">Storage and cost</td><td class="meta">Open</td></tr><tr><td class="num">003</td><td class="what"><a href="https://github.com/kpk111298/kommineni-group/tree/main/problems/003-late-arriving-updates">Late payments flip the revenue number</a><span>Payments that succeed days later keep changing past revenue.</span></td><td class="meta"><a href="/meel-cart/">Meel Cart</a></td><td class="meta">Incremental loading</td><td class="meta">Solved, write-up coming</td></tr></tbody></table>
+  </div>
+</section>
+<section class="section">
+  <div class="wrap">
+    <div class="section-head"><h2>Coming next</h2><p>The roadmap, grouped by what goes wrong. New problems get added as the businesses grow.</p></div>
+    <div class="roadmap"><div><h3>Getting data in</h3><ul><li>A supplier adds a new column every month</li><li>An ad platform that rate limits after 50 calls</li><li>An empty file that wipes out yesterday&#x27;s dashboard</li><li>Copying a whole loans table every night takes four hours</li></ul></div><div><h3>Trusting the numbers</h3><ul><li>Same customer, three emails, two businesses</li><li>Cars sold before they were bought</li><li>Catch bad data before the boss sees it</li></ul></div><div><h3>Modeling</h3><ul><li>A salesperson moves branches and last year&#x27;s numbers shift</li><li>One sales model across cars and online orders</li><li>Finance and marketing count customers differently</li></ul></div><div><h3>Streaming</h3><ul><li>Track delivery trucks live</li><li>The same click arrives twice</li><li>Flag a suspicious payment within seconds</li></ul></div><div><h3>Running reliably</h3><ul><li>A job fails at step four of six</li><li>Rebuild six months after a bug fix</li><li>Job B starts before job A finishes</li></ul></div><div><h3>Speed and cost</h3><ul><li>The daily sales query takes 20 minutes</li><li>Millions of tiny files</li><li>Cut the warehouse bill in half</li></ul></div><div><h3>Privacy and audit</h3><ul><li>Analysts can see full identity numbers</li><li>A customer asks to be deleted everywhere</li><li>Who changed this number, and when</li></ul></div><div><h3>Healthcare</h3><ul><li>Flatten nested FHIR patient records</li><li>Remove the 18 HIPAA identifiers</li><li>Claims adjusted weeks after the visit</li></ul></div></div>
+  </div>
+</section>
+
+</main>
+<footer class="site-foot">
+  <div class="wrap">
+    <div>
+      <img src="/assets/brand/kommineni-group-lockup-dark.svg" alt="Kommineni Group" width="280" height="64">
+      <p>Kommineni Group is a simulated company. The businesses, customers and numbers are made up. The engineering is real: every pipeline, test and fix is built by <a href="https://pkomm.com">Prameel Kommineni</a>.</p>
+    </div>
+    <ul>
+      <li><a href="/#businesses">Our businesses</a></li>
+      <li><a href="/engineering/">Engineering problems</a></li>
+      <li><a href="/about/">How it works</a></li>
+      <li><a href="https://github.com/kpk111298/kommineni-group">Code on GitHub</a></li>
+      <li><a href="https://pkomm.com">Prameel Kommineni</a></li>
+    </ul>
+    <p class="small">Copyright 2026 Prameel Kommineni. All rights reserved.</p>
+  </div>
+</footer>
+<script>
+  (function () {
+    var b = document.querySelector('.nav-toggle'), n = document.getElementById('nav');
+    if (!b) return;
+    b.addEventListener('click', function () {
+      var open = n.classList.toggle('open');
+      b.setAttribute('aria-expanded', open ? 'true' : 'false');
+      b.textContent = open ? 'Close' : 'Menu';
+    });
+  })();
+</script>
+</body>
+</html>

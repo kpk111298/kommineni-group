@@ -1,0 +1,108 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>How it works | Kommineni Group</title>
+<meta name="description" content="How Kommineni Group works: simulated businesses, real world data and real data engineering.">
+<link rel="canonical" href="https://group.pkomm.com/about/">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="Kommineni Group">
+<meta property="og:title" content="How it works | Kommineni Group">
+<meta property="og:description" content="How Kommineni Group works: simulated businesses, real world data and real data engineering.">
+<meta property="og:url" content="https://group.pkomm.com/about/">
+<meta property="og:image" content="https://group.pkomm.com/assets/og.png">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="theme-color" content="#0A0D16">
+<link rel="icon" href="/assets/favicon.svg" type="image/svg+xml">
+<link rel="apple-touch-icon" href="/assets/apple-touch-icon.png">
+<link rel="preload" href="/assets/fonts/cormorant-garamond-latin-500-normal.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="stylesheet" href="/assets/site.css">
+</head>
+<body>
+<a class="skip" href="#main">Skip to content</a>
+<header class="site-head">
+  <div class="wrap">
+    <a class="brand" href="/"><img src="/assets/brand/kommineni-group.svg" alt="" width="40" height="40"><span>Kommineni Group</span></a>
+    <button class="nav-toggle" aria-expanded="false" aria-controls="nav">Menu</button>
+    <nav class="nav" id="nav" aria-label="Main"><a href="/#businesses">Businesses</a><a href="/engineering/">Engineering</a><a href="/about/" aria-current="page">How it works</a><a href="https://pkomm.com">Prameel Kommineni</a></nav>
+  </div>
+</header>
+<main id="main">
+
+<section class="hero">
+  <div class="wrap" style="display:block">
+    <h1>How it works</h1>
+    <p class="lede">A company that only exists to create real data problems, so they can be solved properly and in the open.</p>
+  </div>
+</section>
+<section class="section">
+  <div class="wrap prose">
+    <h2>Why a whole company</h2>
+    <p>Practice projects usually start with clean data and end with a chart. Real jobs don't work that way. Data arrives late, changes after the fact, breaks without warning and has to match across teams. Kommineni Group exists to recreate that, across every kind of business a data engineer might work for.</p>
+
+    <h2>What's real and what isn't</h2>
+    <ul>
+      <li>The businesses, people and numbers are simulated.</li>
+      <li>The world they react to is real: interest rates from the Federal Reserve, gas prices, weather, vehicle recalls and holidays, all from free public sources.</li>
+      <li>The engineering is real: source systems, pipelines, tests, dashboards and fixes, all on <a href="https://github.com/kpk111298/kommineni-group">GitHub</a>.</li>
+    </ul>
+
+    <h2>A day at the company</h2>
+    <ol>
+      <li>The day gets set: normal, or a scenario like Black Friday, a supplier changing a file format, or a storm closing a branch.</li>
+      <li>Each business's systems record activity as it happens, the way real software does.</li>
+      <li>Pipelines load the raw data, clean it, test it and build the numbers each business reports on.</li>
+      <li>Dashboards show how the day went.</li>
+      <li>When a number looks wrong, it becomes a ticket. The fix gets tested and written up.</li>
+    </ol>
+
+    <h2>Tools</h2>
+    <p>Everything runs for free: Python, Postgres, DuckDB, dbt, Streamlit and GitHub Actions today, with Spark, Delta Lake, Dagster, Kafka-style streaming and Terraform on the way. Every write-up also shows the cloud version:</p>
+    <table class="map">
+      <thead><tr><th>Job</th><th>Here</th><th>AWS</th><th>Azure</th></tr></thead>
+      <tbody>
+        <tr><td>Storage</td><td>Local files</td><td>S3</td><td>ADLS Gen2</td></tr>
+        <tr><td>Warehouse</td><td>DuckDB, Postgres</td><td>Redshift, Athena</td><td>Synapse, Fabric</td></tr>
+        <tr><td>Transforms</td><td>dbt</td><td>dbt, Glue</td><td>dbt, Data Factory</td></tr>
+        <tr><td>Scheduling</td><td>GitHub Actions, Dagster</td><td>MWAA, Step Functions</td><td>Data Factory pipelines</td></tr>
+        <tr><td>Streaming</td><td>Redpanda</td><td>Kinesis, MSK</td><td>Event Hubs</td></tr>
+        <tr><td>Dashboards</td><td>Streamlit</td><td>QuickSight</td><td>Power BI</td></tr>
+      </tbody>
+    </table>
+
+    <h2>Who runs it</h2>
+    <p>Kommineni Group is built by <a href="https://pkomm.com">Prameel Kommineni</a>, a data engineer working across AWS, Azure and Snowflake. The name is his family name. The rest is made up.</p>
+  </div>
+</section>
+
+</main>
+<footer class="site-foot">
+  <div class="wrap">
+    <div>
+      <img src="/assets/brand/kommineni-group-lockup-dark.svg" alt="Kommineni Group" width="280" height="64">
+      <p>Kommineni Group is a simulated company. The businesses, customers and numbers are made up. The engineering is real: every pipeline, test and fix is built by <a href="https://pkomm.com">Prameel Kommineni</a>.</p>
+    </div>
+    <ul>
+      <li><a href="/#businesses">Our businesses</a></li>
+      <li><a href="/engineering/">Engineering problems</a></li>
+      <li><a href="/about/">How it works</a></li>
+      <li><a href="https://github.com/kpk111298/kommineni-group">Code on GitHub</a></li>
+      <li><a href="https://pkomm.com">Prameel Kommineni</a></li>
+    </ul>
+    <p class="small">Copyright 2026 Prameel Kommineni. All rights reserved.</p>
+  </div>
+</footer>
+<script>
+  (function () {
+    var b = document.querySelector('.nav-toggle'), n = document.getElementById('nav');
+    if (!b) return;
+    b.addEventListener('click', function () {
+      var open = n.classList.toggle('open');
+      b.setAttribute('aria-expanded', open ? 'true' : 'false');
+      b.textContent = open ? 'Close' : 'Menu';
+    });
+  })();
+</script>
+</body>
+</html>

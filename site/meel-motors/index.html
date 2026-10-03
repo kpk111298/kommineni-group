@@ -1,0 +1,99 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Meel Motors | Kommineni Group</title>
+<meta name="description" content="Meel Motors: Five dealerships selling new and used cars, with a service bay at every branch. A Kommineni Group business.">
+<link rel="canonical" href="https://group.pkomm.com/meel-motors/">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="Kommineni Group">
+<meta property="og:title" content="Meel Motors | Kommineni Group">
+<meta property="og:description" content="Meel Motors: Five dealerships selling new and used cars, with a service bay at every branch. A Kommineni Group business.">
+<meta property="og:url" content="https://group.pkomm.com/meel-motors/">
+<meta property="og:image" content="https://group.pkomm.com/assets/og.png">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="theme-color" content="#0A0D16">
+<link rel="icon" href="/assets/favicon.svg" type="image/svg+xml">
+<link rel="apple-touch-icon" href="/assets/apple-touch-icon.png">
+<link rel="preload" href="/assets/fonts/cormorant-garamond-latin-500-normal.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="stylesheet" href="/assets/site.css">
+</head>
+<body>
+<a class="skip" href="#main">Skip to content</a>
+<header class="site-head">
+  <div class="wrap">
+    <a class="brand" href="/"><img src="/assets/brand/kommineni-group.svg" alt="" width="40" height="40"><span>Kommineni Group</span></a>
+    <button class="nav-toggle" aria-expanded="false" aria-controls="nav">Menu</button>
+    <nav class="nav" id="nav" aria-label="Main"><a href="/#businesses">Businesses</a><a href="/engineering/">Engineering</a><a href="/about/">How it works</a><a href="https://pkomm.com">Prameel Kommineni</a></nav>
+  </div>
+</header>
+<main id="main">
+
+<section class="biz-hero" style="--accent: #7A2E2A">
+  <div class="wrap">
+    <img src="/assets/brand/meel-motors.svg" alt="" width="148" height="148">
+    <div>
+      <p class="kicker">Car dealership, a Kommineni Group business</p>
+      <h1>Meel Motors</h1>
+      <p class="lede">Meel Motors sells and services cars in Dallas, Chicago, Atlanta, Phoenix and Seattle. It was the first Kommineni Group business, and it started life as Kommineni Automotive.</p>
+      <div class="actions"><a class="button primary" href="https://kommineni-automotive.streamlit.app">Open the live dashboard</a><a class="button" href="https://github.com/kpk111298/kommineni-group/tree/main/divisions/meel-motors">See the code</a></div>
+    </div>
+  </div>
+</section>
+
+<section class="section" style="--accent: #7A2E2A">
+  <div class="wrap facts">
+    <div>
+      <h2>How it runs</h2>
+      <p>A dealer management system records every sale, every car on the lot and every service job.</p>
+      <ul class="tables" aria-label="Data it creates"><li>Sales</li><li>Vehicles</li><li>Service jobs</li><li>Employees</li><li>Branches and targets</li></ul>
+    </div>
+    <div>
+      <h2>What makes its data hard</h2>
+      <ul><li>Saturdays are the busiest day and month-ends turn frantic as salespeople chase targets.</li><li>Illinois bans car sales on Sundays, so the Chicago branch shows no Sunday sales.</li><li>Loan rates, gas prices and tax refund season all move what people buy.</li><li>Real recalls send waves of owners back to the service bay.</li></ul>
+    </div>
+    <div>
+      <h2>What's built so far</h2>
+      <ul><li>Raw data lands in DuckDB, dbt cleans it and builds the business tables</li><li>23 automated data quality tests</li><li>A live dashboard with separate views for executives, branch managers and salespeople</li></ul>
+    </div>
+  </div>
+</section>
+
+<section class="section">
+  <div class="wrap">
+    <div class="section-head"><h2>Problems from Meel Motors</h2><p>Logged, fixed and written up one at a time.</p></div>
+    <table class="ledger"><thead><tr><th>No.</th><th>Problem</th><th>Area</th><th>Status</th></tr></thead><tbody><tr><td class="num">001</td><td class="what"><a href="https://github.com/kpk111298/kommineni-group/tree/main/problems/001-history-rewrites-itself">Yesterday&#x27;s sales changed overnight</a><span>The dealership&#x27;s history rewrites itself every morning.</span></td><td class="meta">Incremental loading</td><td class="meta">Open</td></tr><tr><td class="num">002</td><td class="what"><a href="https://github.com/kpk111298/kommineni-group/tree/main/problems/002-database-in-git">The repo that grows every day</a><span>A daily job saves the whole database into git.</span></td><td class="meta">Storage and cost</td><td class="meta">Open</td></tr></tbody></table>
+  </div>
+</section>
+
+</main>
+<footer class="site-foot">
+  <div class="wrap">
+    <div>
+      <img src="/assets/brand/kommineni-group-lockup-dark.svg" alt="Kommineni Group" width="280" height="64">
+      <p>Kommineni Group is a simulated company. The businesses, customers and numbers are made up. The engineering is real: every pipeline, test and fix is built by <a href="https://pkomm.com">Prameel Kommineni</a>.</p>
+    </div>
+    <ul>
+      <li><a href="/#businesses">Our businesses</a></li>
+      <li><a href="/engineering/">Engineering problems</a></li>
+      <li><a href="/about/">How it works</a></li>
+      <li><a href="https://github.com/kpk111298/kommineni-group">Code on GitHub</a></li>
+      <li><a href="https://pkomm.com">Prameel Kommineni</a></li>
+    </ul>
+    <p class="small">Copyright 2026 Prameel Kommineni. All rights reserved.</p>
+  </div>
+</footer>
+<script>
+  (function () {
+    var b = document.querySelector('.nav-toggle'), n = document.getElementById('nav');
+    if (!b) return;
+    b.addEventListener('click', function () {
+      var open = n.classList.toggle('open');
+      b.setAttribute('aria-expanded', open ? 'true' : 'false');
+      b.textContent = open ? 'Close' : 'Menu';
+    });
+  })();
+</script>
+</body>
+</html>

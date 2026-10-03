@@ -1,0 +1,99 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Meel Cart | Kommineni Group</title>
+<meta name="description" content="Meel Cart: The group&#x27;s online store, selling to customers in five countries. A Kommineni Group business.">
+<link rel="canonical" href="https://group.pkomm.com/meel-cart/">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="Kommineni Group">
+<meta property="og:title" content="Meel Cart | Kommineni Group">
+<meta property="og:description" content="Meel Cart: The group&#x27;s online store, selling to customers in five countries. A Kommineni Group business.">
+<meta property="og:url" content="https://group.pkomm.com/meel-cart/">
+<meta property="og:image" content="https://group.pkomm.com/assets/og.png">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="theme-color" content="#0A0D16">
+<link rel="icon" href="/assets/favicon.svg" type="image/svg+xml">
+<link rel="apple-touch-icon" href="/assets/apple-touch-icon.png">
+<link rel="preload" href="/assets/fonts/cormorant-garamond-latin-500-normal.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="stylesheet" href="/assets/site.css">
+</head>
+<body>
+<a class="skip" href="#main">Skip to content</a>
+<header class="site-head">
+  <div class="wrap">
+    <a class="brand" href="/"><img src="/assets/brand/kommineni-group.svg" alt="" width="40" height="40"><span>Kommineni Group</span></a>
+    <button class="nav-toggle" aria-expanded="false" aria-controls="nav">Menu</button>
+    <nav class="nav" id="nav" aria-label="Main"><a href="/#businesses">Businesses</a><a href="/engineering/">Engineering</a><a href="/about/">How it works</a><a href="https://pkomm.com">Prameel Kommineni</a></nav>
+  </div>
+</header>
+<main id="main">
+
+<section class="biz-hero" style="--accent: #8C5A1E">
+  <div class="wrap">
+    <img src="/assets/brand/meel-cart.svg" alt="" width="148" height="148">
+    <div>
+      <p class="kicker">Online store, a Kommineni Group business</p>
+      <h1>Meel Cart</h1>
+      <p class="lede">Meel Cart sells online across the US, Canada, the UK, Europe and India. Orders change status for days after they are placed, which makes its numbers hard to get right.</p>
+      <div class="actions"><a class="button primary" href="https://github.com/kpk111298/kommineni-group/tree/main/divisions/meel-cart">See the code</a></div>
+    </div>
+  </div>
+</section>
+
+<section class="section" style="--accent: #8C5A1E">
+  <div class="wrap facts">
+    <div>
+      <h2>How it runs</h2>
+      <p>A storefront and order system that records customers, orders, payments and shipments.</p>
+      <ul class="tables" aria-label="Data it creates"><li>Customers</li><li>Products</li><li>Orders</li><li>Order items</li><li>Payments</li><li>Shipments</li></ul>
+    </div>
+    <div>
+      <h2>What makes its data hard</h2>
+      <ul><li>Payments fail and succeed days later, so yesterday&#x27;s revenue keeps moving.</li><li>Shipments arrive late and orders get returned weeks after delivery.</li><li>Prices, taxes and time zones differ by country.</li><li>Black Friday brings ten times a normal day&#x27;s orders.</li></ul>
+    </div>
+    <div>
+      <h2>What's built so far</h2>
+      <ul><li>A daily pipeline that loads only what changed</li><li>Late updates handled by keeping the newest version of every record</li><li>A backfill script that safely rebuilds any date range</li><li>A dashboard with daily orders, revenue, payment failures and on-time delivery</li></ul>
+    </div>
+  </div>
+</section>
+
+<section class="section">
+  <div class="wrap">
+    <div class="section-head"><h2>Problems from Meel Cart</h2><p>Logged, fixed and written up one at a time.</p></div>
+    <table class="ledger"><thead><tr><th>No.</th><th>Problem</th><th>Area</th><th>Status</th></tr></thead><tbody><tr><td class="num">003</td><td class="what"><a href="https://github.com/kpk111298/kommineni-group/tree/main/problems/003-late-arriving-updates">Late payments flip the revenue number</a><span>Payments that succeed days later keep changing past revenue.</span></td><td class="meta">Incremental loading</td><td class="meta">Solved, write-up coming</td></tr></tbody></table>
+  </div>
+</section>
+
+</main>
+<footer class="site-foot">
+  <div class="wrap">
+    <div>
+      <img src="/assets/brand/kommineni-group-lockup-dark.svg" alt="Kommineni Group" width="280" height="64">
+      <p>Kommineni Group is a simulated company. The businesses, customers and numbers are made up. The engineering is real: every pipeline, test and fix is built by <a href="https://pkomm.com">Prameel Kommineni</a>.</p>
+    </div>
+    <ul>
+      <li><a href="/#businesses">Our businesses</a></li>
+      <li><a href="/engineering/">Engineering problems</a></li>
+      <li><a href="/about/">How it works</a></li>
+      <li><a href="https://github.com/kpk111298/kommineni-group">Code on GitHub</a></li>
+      <li><a href="https://pkomm.com">Prameel Kommineni</a></li>
+    </ul>
+    <p class="small">Copyright 2026 Prameel Kommineni. All rights reserved.</p>
+  </div>
+</footer>
+<script>
+  (function () {
+    var b = document.querySelector('.nav-toggle'), n = document.getElementById('nav');
+    if (!b) return;
+    b.addEventListener('click', function () {
+      var open = n.classList.toggle('open');
+      b.setAttribute('aria-expanded', open ? 'true' : 'false');
+      b.textContent = open ? 'Close' : 'Menu';
+    });
+  })();
+</script>
+</body>
+</html>
