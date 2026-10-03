@@ -1,3 +1,8 @@
+<picture>
+  <source media="(prefers-color-scheme: dark)" srcset="brand/kommineni-group/lockup-dark.svg">
+  <img src="brand/kommineni-group/lockup-light.svg" alt="Kommineni Group" height="72">
+</picture>
+
 # Kommineni Group
 
 A simulated company built to practise real data engineering problems, solve them, and write them up.
@@ -52,6 +57,7 @@ kommineni-group/
   control-room/  private app that sets the day and triggers scenarios
   problems/      one folder per problem: ticket, solution, tests, write-up
   docs/          company story, standards, tool map
+  brand/         logos for the group and every division
 ```
 
 ## Free tools used

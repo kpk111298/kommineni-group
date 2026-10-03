@@ -1,3 +1,8 @@
+<picture>
+  <source media="(prefers-color-scheme: dark)" srcset="../../brand/meel-motors/lockup-dark.svg">
+  <img src="../../brand/meel-motors/lockup-light.svg" alt="Meel Motors" height="72">
+</picture>
+
 # Kommineni Automotive — Data Pipeline & Analytics Platform
 
 A production grade data engineering portfolio project simulating a 5 location automotive dealership. Built to demonstrate real world skills in data ingestion, transformation, warehousing, and analytics.

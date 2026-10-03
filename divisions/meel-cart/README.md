@@ -1,3 +1,8 @@
+<picture>
+  <source media="(prefers-color-scheme: dark)" srcset="../../brand/meel-cart/lockup-dark.svg">
+  <img src="../../brand/meel-cart/lockup-light.svg" alt="Meel Cart" height="72">
+</picture>
+
 # Meel Cart – E-commerce Incremental Analytics
 
 This project simulates a real-world **e-commerce analytics platform** built for a fictional company called **Meel Cart**.
