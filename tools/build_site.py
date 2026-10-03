@@ -2,7 +2,12 @@
 
 Run from the repo root:  python3 tools/build_site.py
 Content lives in this file, so every business page stays consistent.
+
+The site is published at pkomm.com/group, inside the pkomm.com portfolio site.
+To publish, build straight into the portfolio repo:
+    OUT="../pkomm-portfolio/Pkomm Portfolio/group" python3 tools/build_site.py
 """
+import hashlib
 import math
 import os
 import re
@@ -10,9 +15,10 @@ import shutil
 from html import escape
 
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-SITE = os.path.join(ROOT, "site")
+SITE = os.environ.get("OUT", os.path.join(ROOT, "site"))
 BRAND = os.path.join(ROOT, "brand")
-DOMAIN = "https://group.pkomm.com"
+DOMAIN = "https://pkomm.com"
+BASE = "/group"
 REPO = "https://github.com/kpk111298/kommineni-group"
 PORTFOLIO = "https://pkomm.com"
 
@@ -205,7 +211,8 @@ def family_svg():
 
 
 def page(path, title, desc, body, current=""):
-    canon = DOMAIN + path
+    canon = DOMAIN + BASE + path
+    css_v = hashlib.sha1(open(os.path.join(ROOT, "site-src", "site.css"), "rb").read()).hexdigest()[:8]
     nav = [("Businesses", "/#businesses", "businesses"), ("Engineering", "/engineering/", "engineering"),
            ("How it works", "/about/", "about"), ("Prameel Kommineni", PORTFOLIO, "")]
     nav_html = "".join(
@@ -224,13 +231,13 @@ def page(path, title, desc, body, current=""):
 <meta property="og:title" content="{escape(full_title)}">
 <meta property="og:description" content="{escape(desc)}">
 <meta property="og:url" content="{canon}">
-<meta property="og:image" content="{DOMAIN}/assets/og.png">
+<meta property="og:image" content="{DOMAIN}{BASE}/assets/og.png">
 <meta name="twitter:card" content="summary_large_image">
 <meta name="theme-color" content="#0A0D16">
 <link rel="icon" href="/assets/favicon.svg" type="image/svg+xml">
 <link rel="apple-touch-icon" href="/assets/apple-touch-icon.png">
 <link rel="preload" href="/assets/fonts/cormorant-garamond-latin-500-normal.woff2" as="font" type="font/woff2" crossorigin>
-<link rel="stylesheet" href="/assets/site.css">
+<link rel="stylesheet" href="/assets/site.css?v={css_v}">
 </head>
 <body>
 <a class="skip" href="#main">Skip to content</a>
@@ -488,22 +495,21 @@ def about():
                 "How Kommineni Group works: simulated businesses, real world data and real data engineering.", body, "about")
 
 
-def not_found():
-    body = """
-<section class="lost">
-  <div class="wrap">
-    <h1>This page isn't here</h1>
-    <p class="lede">The address may have a typo, or the page moved. Start from the <a href="/">home page</a> or browse the <a href="/#businesses">businesses</a>.</p>
-  </div>
-</section>
-"""
-    return page("/404", "Page not found", "This page doesn't exist.", body)
-
-
 def write(rel, text):
+    if rel.endswith(".html"):
+        text = re.sub(r'(href|src)="/(?!/)', rf'\1="{BASE}/', text)
     path = os.path.join(SITE, rel)
     os.makedirs(os.path.dirname(path), exist_ok=True)
     open(path, "w").write(text)
+
+
+def copy_assets():
+    src = os.path.join(ROOT, "site-src")
+    dest = os.path.join(SITE, "assets")
+    os.makedirs(os.path.join(dest, "fonts"), exist_ok=True)
+    shutil.copy(os.path.join(src, "site.css"), os.path.join(dest, "site.css"))
+    for f in os.listdir(os.path.join(src, "fonts")):
+        shutil.copy(os.path.join(src, "fonts", f), os.path.join(dest, "fonts", f))
 
 
 def copy_brand():
@@ -538,46 +544,8 @@ def icons():
     cairosvg.svg2png(bytestring=og.encode(), write_to=os.path.join(SITE, "assets", "og.png"))
 
 
-def extras():
-    urls = ["/", "/engineering/", "/about/"] + [f"/{b['slug']}/" for b in BUSINESSES]
-    write("sitemap.xml", '<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n'
-          + "".join(f"  <url><loc>{DOMAIN}{u}</loc></url>\n" for u in urls) + "</urlset>\n")
-    write("robots.txt", f"User-agent: *\nAllow: /\n\nSitemap: {DOMAIN}/sitemap.xml\n")
-    write("_headers", """# Cloudflare Pages response headers for group.pkomm.com
-
-/*
-  X-Content-Type-Options: nosniff
-  X-Frame-Options: DENY
-  Referrer-Policy: strict-origin-when-cross-origin
-  Permissions-Policy: camera=(), microphone=(), geolocation=(), interest-cohort=()
-  Strict-Transport-Security: max-age=31536000; includeSubDomains
-
-/assets/fonts/*
-  Cache-Control: public, max-age=31536000, immutable
-
-/assets/*
-  Cache-Control: public, max-age=0, must-revalidate
-
-# Preview addresses stay out of search results
-https://:project.pages.dev/*
-  X-Robots-Tag: noindex
-https://:version.:project.pages.dev/*
-  X-Robots-Tag: noindex
-""")
-    write("_redirects", """# Friendly addresses
-/motors      /meel-motors/   301
-/cart        /meel-cart/     301
-/care        /meel-care/     301
-/move        /meel-move/     301
-/pay         /meel-pay/      301
-/reach       /meel-reach/    301
-/hq          /kommineni-hq/  301
-/problems    /engineering/   301
-/how-it-works /about/        301
-""")
-
-
 if __name__ == "__main__":
+    copy_assets()
     copy_brand()
     icons()
     write("index.html", home())
@@ -585,6 +553,4 @@ if __name__ == "__main__":
         write(f"{b['slug']}/index.html", business(b))
     write("engineering/index.html", engineering())
     write("about/index.html", about())
-    write("404.html", not_found())
-    extras()
     print("site built")
