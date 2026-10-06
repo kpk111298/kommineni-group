@@ -18,11 +18,6 @@ Every Kommineni Group business shares one look, so they read as one company. The
 | Kommineni Group | Gold `#C9AE72` on navy `#0A0D16` | Serif K |
 | Meel Motors | Oxblood `#7A2E2A` | Steering wheel |
 | Meel Cart | Ochre `#8C5A1E` | Shopping bag |
-| Meel Care | Forest `#2F5D46` | Cross |
-| Meel Move | Ink blue `#2A4A73` | Arrow |
-| Meel Pay | Plum `#4E3A6B` | Cut gem |
-| Meel Reach | Rosewood `#8A3A52` | Guiding star |
-| Kommineni HQ | Slate `#4A4F58` | Columned building |
 
 Gold text on white uses `#8A7344` so it stays readable. Ivory on navy is `#F4F1EA`.
 
@@ -41,6 +36,8 @@ All text is already drawn as shapes, so the logos look the same on any machine.
 - Keep clear space around a logo equal to a quarter of the seal.
 - Smallest seal: 32px. Below that the fine lines get too faint.
 - Don't fill the seal, thicken the lines, add shadows, or swap a division's accent or symbol.
+
+New businesses get their logo when they launch: add them to `ENTITIES` and `GLYPHS` in the script.
 
 ## Rebuilding
 

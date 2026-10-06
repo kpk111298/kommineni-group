@@ -3,7 +3,7 @@
 **Division:** Meel Cart
 **Domain:** Incremental loading
 **Level:** 2
-**Status:** Solved, write-up pending
+**Status:** Fixed, needs tests and write-up
 
 ## The ticket
 Finance: Monday's revenue looked fine on Monday. By Thursday it was lower. Why does the past keep moving?

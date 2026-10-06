@@ -18,12 +18,11 @@ Managers lose trust in the dashboard. Monthly targets and commissions depend on 
 Free tools only. The live dashboard must keep working.
 
 ## The fix (plan)
-1. Replace `data_generator/` with the Meel Motors DMS in `sources/dms/`, following [source-systems.md](../../docs/source-systems.md). It writes sales one at a time into Postgres, uses a fixed seed per day, and never rewrites a closed day.
+1. Replace `data_generator/` with the Meel Motors DMS in `sources/dms/`. It writes sales one at a time into Postgres, uses a fixed seed per day, and never rewrites a closed day.
 2. Add real business patterns: busy Saturdays, month-end rush, no Sunday sales in Illinois, tax refund season, top sellers, lot-age discounts, repeat service customers.
-3. Read real world data from `shared/world/`: interest rates, gas prices, weather, recalls, holidays.
-4. Make bronze append-only with `_ingested_at` and `_source_file`, never a full replace.
-5. Make dbt silver and gold models incremental.
-6. Add a test: a closed day's totals never change after it closes.
+3. Make bronze append-only with `_ingested_at` and `_source_file`, never a full replace.
+4. Make dbt silver and gold models incremental.
+5. Add a test: a closed day's totals never change after it closes.
 
 ## Proof
 To do.

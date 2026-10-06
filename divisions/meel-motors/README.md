@@ -31,7 +31,7 @@ Raw ingestion with metadata — _ingested_at, _source_file
     ↓
 Silver Layer (dbt)
 Cleaned, typed, standardized staging models
-17 automated data quality tests
+17 automated data quality tests (6 more on the gold layer)
     ↓
 Gold Layer (dbt)
 Business KPI aggregations
@@ -78,7 +78,6 @@ Role based access: Executive, Branch Manager, Salesperson
 - Primary key uniqueness
 - Not null constraints on critical fields
 - Accepted value validation
-- Referential integrity across tables
 
 ---
 
