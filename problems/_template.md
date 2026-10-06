@@ -38,12 +38,12 @@ The bug, wrong turn or surprise you hit while building it, and how you caught it
 ### 5. Honest limits
 Where this fix would break: bigger data, a crash halfway, a new kind of input. And what you'd do next about it.
 
-### 6. On AWS and Azure
-| Step | Here | AWS | Azure |
-|---|---|---|---|
-| | | | |
+### 6. On the job: AWS, Azure, Snowflake
+| Step | What I used here | AWS | Azure | Snowflake / Databricks |
+|---|---|---|---|---|
+| | | | | |
 
-One or two sentences on what changes in the cloud and what stays the same.
+Then say it plainly, in four parts: the service a team would use, why I used the open source tool instead, what carries over as is, and what changes in the cloud. See the [tool map](../docs/tool-map.md).
 
 ## What I learned
 Two or three lines. This becomes the interview answer.

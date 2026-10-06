@@ -28,11 +28,13 @@ More businesses open one at a time, each when there's a real problem to solve in
 | 002 | [The repo that grows every day](problems/002-database-in-git) | Meel Motors | Open |
 | 003 | [Late payments flip the revenue number](problems/003-late-arriving-updates) | Meel Cart | Fixed, needs tests and write-up |
 
-Every write-up follows the same [template](problems/_template.md): the problem, the fix, why this way, what went wrong, proof, honest limits, and how it would look on AWS and Azure ([tool map](docs/tool-map.md)).
+Every write-up follows the same [template](problems/_template.md): the problem, the fix, why this way, what went wrong, proof, honest limits, and how it would run on AWS, Azure or Snowflake.
 
 ## Tools
 
-Python, DuckDB, dbt, Streamlit and GitHub Actions. Everything runs free on a laptop.
+Python and SQL, with DuckDB, dbt, Streamlit and GitHub Actions. Everything runs free, on open source tools.
+
+Each one stands in for a cloud service a real team would use. The [tool map](docs/tool-map.md) shows which, across AWS, Azure, Snowflake and Databricks, and every write-up explains what would carry over and what would change.
 
 ## History
 
