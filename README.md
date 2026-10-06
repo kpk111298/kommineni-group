@@ -32,7 +32,7 @@ Every write-up follows the same [template](problems/_template.md): the problem, 
 
 ## Tools
 
-Python and SQL, with DuckDB, dbt, Streamlit and GitHub Actions. Everything runs free, on open source tools.
+Python and SQL, with DuckDB, dbt and Streamlit (all open source) and GitHub Actions (free for public repos). Nothing costs money.
 
 Each one stands in for a cloud service a real team would use. The [tool map](docs/tool-map.md) shows which, across AWS, Azure, Snowflake and Databricks, and every write-up explains what would carry over and what would change.
 
