@@ -1,0 +1,152 @@
+/* Pkomm Motors dashboard. Colours and type follow the Pkomm Group brand. */
+
+:root {
+  --navy: #0A0D16;
+  --ink: #1B1F2A;
+  --ink-2: #5A5F6B;
+  --ink-3: #8A8F99;
+  --rule: #E6E2D8;
+  --wash: #F7F5F0;
+  --gold: #C9AE72;
+  --gold-ink: #8A7344;
+  --motors: #7A2E2A;
+  --good: #2F6B45;
+  --bad: #A23B2E;
+  color-scheme: light;
+}
+
+html, body, .stApp, [class*="css"], button, input, select, textarea {
+  font-family: "Jost", system-ui, -apple-system, "Segoe UI", sans-serif !important;
+}
+
+.stApp { background: #FFFFFF !important; color: var(--ink); }
+
+/* Streamlit chrome we don't need */
+#MainMenu, footer, header[data-testid="stHeader"] { visibility: hidden; height: 0; }
+[data-testid="stSidebar"], [data-testid="collapsedControl"] { display: none !important; }
+.block-container { padding: 0 2.5rem 4rem !important; max-width: 1240px !important; }
+
+h1, h2, h3, .serif {
+  font-family: "Cormorant Garamond", Georgia, serif !important;
+  font-weight: 500 !important;
+  color: var(--navy) !important;
+  letter-spacing: 0 !important;
+}
+
+/* Top bar */
+.pk-bar {
+  display: flex; align-items: center; justify-content: space-between; gap: 16px;
+  padding: 18px 0 16px; border-bottom: 1px solid var(--rule); margin-bottom: 4px;
+}
+.pk-brand { display: flex; align-items: center; gap: 12px; }
+.pk-brand svg { width: 40px; height: 40px; }
+.pk-brand .name { font-family: "Cormorant Garamond", Georgia, serif; font-size: 24px; color: var(--navy); line-height: 1; }
+.pk-brand .note { font-size: 12.5px; color: var(--ink-3); margin-top: 3px; }
+.pk-meta { display: flex; align-items: center; gap: 18px; font-size: 13px; color: var(--ink-2); }
+.pk-meta b { color: var(--ink); font-weight: 500; }
+.pk-fresh {
+  display: inline-flex; align-items: center; gap: 7px; padding: 5px 11px;
+  border: 1px solid var(--rule); border-radius: 999px; font-size: 12.5px; color: var(--ink-2); white-space: nowrap;
+}
+.pk-fresh i { width: 7px; height: 7px; border-radius: 50%; background: var(--gold); display: inline-block; }
+.pk-fresh.run i { background: var(--good); }
+
+/* Tabs */
+.stTabs [data-baseweb="tab-list"] { gap: 28px; border-bottom: 1px solid var(--rule); }
+.stTabs [data-baseweb="tab"] {
+  height: 46px; padding: 0; background: transparent; font-size: 15px; color: var(--ink-3);
+}
+.stTabs [aria-selected="true"] { color: var(--navy) !important; }
+.stTabs [data-baseweb="tab-highlight"] { background: var(--gold) !important; height: 2px; }
+.stTabs [data-baseweb="tab-border"] { display: none; }
+
+/* Page headings inside a tab */
+.pk-head { margin: 26px 0 18px; }
+.pk-head h2 { font-size: 34px !important; margin: 0 0 4px !important; padding: 0 !important; }
+.pk-head p { margin: 0; color: var(--ink-2); font-size: 14.5px; max-width: 46em; }
+.pk-sub { font-family: "Cormorant Garamond", Georgia, serif; font-size: 23px; color: var(--navy); margin: 28px 0 10px; }
+.pk-quiet { color: var(--ink-3); font-size: 13px; }
+
+/* Metrics */
+[data-testid="stMetric"] {
+  border: 1px solid var(--rule); border-radius: 8px; padding: 16px 18px 14px; background: #fff;
+}
+[data-testid="stMetricLabel"] p { font-size: 13px !important; color: var(--ink-2) !important; }
+[data-testid="stMetricValue"] {
+  font-size: 30px !important; font-weight: 500 !important; color: var(--navy) !important;
+  font-variant-numeric: tabular-nums;
+}
+[data-testid="stMetricDelta"] { font-size: 12.5px !important; }
+[data-testid="stMetricDelta"] svg { display: none; }
+
+/* Controls */
+.stButton > button, .stDownloadButton > button {
+  border-radius: 6px !important; font-size: 14px !important; font-weight: 500 !important;
+  padding: 8px 18px !important; border: 1px solid var(--navy) !important;
+  background: #fff !important; color: var(--navy) !important; box-shadow: none !important;
+}
+.stButton > button:hover { background: var(--wash) !important; }
+.stButton > button[kind="primary"] { background: var(--navy) !important; color: #fff !important; }
+.stButton > button[kind="primary"]:hover { background: #262B3A !important; }
+.stButton > button:disabled { opacity: .45; }
+[data-baseweb="select"] > div, .stTextInput input { border-radius: 6px !important; border-color: var(--rule) !important; }
+[data-testid="stDataFrame"] { border: 1px solid var(--rule); border-radius: 8px; }
+
+/* Pipeline steps */
+.pk-steps { border-top: 1px solid var(--rule); margin-top: 6px; }
+.pk-step {
+  display: grid; grid-template-columns: 34px minmax(0, 1fr) 90px 92px; gap: 14px; align-items: center;
+  padding: 13px 4px; border-bottom: 1px solid var(--rule); font-size: 14.5px;
+}
+.pk-step .n { font-family: "Cormorant Garamond", Georgia, serif; font-size: 22px; color: var(--gold-ink); }
+.pk-step .what b { font-weight: 500; color: var(--ink); display: block; }
+.pk-step .what span { color: var(--ink-2); font-size: 13.5px; }
+.pk-step .t { color: var(--ink-3); font-variant-numeric: tabular-nums; text-align: right; font-size: 13px; }
+.pk-step .s { text-align: right; font-size: 13px; font-weight: 500; }
+.pk-step.done .s { color: var(--good); }
+.pk-step.fail .s { color: var(--bad); }
+.pk-step.wait { color: var(--ink-3); }
+.pk-step.wait .what b { color: var(--ink-3); }
+
+/* Health and tests */
+.pk-table { width: 100%; border-collapse: collapse; font-size: 14px; }
+.pk-table th { text-align: left; font-weight: 500; color: var(--ink-2); font-size: 12.5px; padding: 0 12px 8px 0; border-bottom: 1px solid var(--navy); }
+.pk-table td { padding: 11px 12px 11px 0; border-bottom: 1px solid var(--rule); vertical-align: top; }
+.pk-table td.num { font-variant-numeric: tabular-nums; }
+.pk-ok { color: var(--good); }
+.pk-warn { color: var(--gold-ink); }
+.pk-bad { color: var(--bad); }
+
+.pk-callout {
+  border-left: 2px solid var(--gold); background: var(--wash); padding: 12px 16px; margin: 14px 0; font-size: 14px; color: var(--ink);
+}
+.pk-callout.bad { border-left-color: var(--bad); }
+
+/* Problems list */
+.pk-problem { border-bottom: 1px solid var(--rule); padding: 16px 0; display: grid; grid-template-columns: 54px minmax(0, 1fr) 190px; gap: 14px; }
+.pk-problem .n { font-family: "Cormorant Garamond", Georgia, serif; font-size: 24px; color: var(--gold-ink); }
+.pk-problem h4 { font-family: "Cormorant Garamond", Georgia, serif !important; font-weight: 500; font-size: 21px; margin: 0 0 4px; color: var(--navy); }
+.pk-problem p { margin: 0; font-size: 14px; color: var(--ink-2); }
+.pk-problem .st { font-size: 13px; color: var(--ink-2); text-align: right; }
+a { color: var(--navy); text-decoration-color: var(--gold); text-underline-offset: 3px; }
+
+/* Login */
+.pk-login { max-width: 560px; margin: 70px auto 0; text-align: center; }
+.pk-login svg { width: 64px; height: 64px; margin: 0 auto 14px; display: block; }
+.pk-login h1 { font-size: 44px !important; margin: 0 !important; }
+.pk-login p { color: var(--ink-2); font-size: 15px; margin: 10px auto 0; max-width: 34em; }
+
+@media (max-width: 760px) {
+  .block-container { padding: 0 1rem 3rem !important; }
+  .pk-bar { flex-wrap: wrap; }
+  .pk-meta { flex-wrap: wrap; gap: 10px; }
+  .pk-step { grid-template-columns: 28px minmax(0, 1fr) 70px; }
+  .pk-step .t { display: none; }
+  .pk-problem { grid-template-columns: 40px minmax(0, 1fr); }
+  .pk-problem .st { text-align: left; grid-column: 2; }
+}
+
+/* Streamlit adds a link icon next to headings, which pushes them off centre */
+[data-testid="stHeaderActionElements"], h1 a, h2 a, h3 a { display: none !important; }
+.stMarkdown a, .stMarkdown a:visited { color: var(--navy) !important; text-decoration-color: var(--gold) !important; }
+.pk-login { margin-bottom: 22px; }

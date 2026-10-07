@@ -1,1200 +1,642 @@
-# ============================================================
-# Pkomm Motors - Clean Light Dashboard
-# White + Dark text + Gold | Top filters | No sidebar
-# ============================================================
+# Pkomm Motors dashboard
+#
+# Three tabs:
+#   Business view    what a manager sees, with a different view per role
+#   How it runs      runs the real pipeline on demand and shows each step
+#   Problems solved  the problems found in this business and their write-ups
+#
+# Pkomm Motors is a fictional company. All data is simulated.
 
-import streamlit as st
+import html
+import os
+import sys
+import time
+from datetime import datetime, timedelta
+
 import duckdb
 import pandas as pd
 import plotly.graph_objects as go
-from datetime import datetime, date, timedelta
-import os
+import streamlit as st
+
+HERE = os.path.dirname(os.path.abspath(__file__))
+sys.path.insert(0, HERE)
+
+import pipeline  # noqa: E402
+SAMPLE_DB = os.path.join(HERE, "..", "pkomm_motors.duckdb")
+BRAND = os.path.join(HERE, "..", "..", "..", "brand", "pkomm-motors")
+REPO = "https://github.com/kpk111298/pkomm-group/blob/main/divisions/pkomm-motors"
+REPO_TREE = "https://github.com/kpk111298/pkomm-group/tree/main"
 
 st.set_page_config(
     page_title="Pkomm Motors",
-    page_icon=None,
+    page_icon=os.path.join(BRAND, "mark.png") if os.path.exists(os.path.join(BRAND, "mark.png")) else None,
     layout="wide",
-    initial_sidebar_state="collapsed"
+    initial_sidebar_state="collapsed",
 )
 
-st.markdown("""
-<style>
-@import url('https://fonts.googleapis.com/css2?family=Sora:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap');
-
-* {
-    font-family: 'Sora', sans-serif !important;
-    box-sizing: border-box;
-}
-
-/* White background */
-.stApp {
-    background: #FAFAFA !important;
-    color-scheme: light !important;
-}
-
-/* Force light mode - override phone dark mode */
-:root {
-    color-scheme: light !important;
-}
-
-@media (prefers-color-scheme: dark) {
-    .stApp, body, html {
-        background: #FAFAFA !important;
-        color: #1A1A1A !important;
-        color-scheme: light !important;
-    }
-    
-    input, select, textarea {
-        background: #FAFAFA !important;
-        color: #1A1A1A !important;
-    }
-
-    .stRadio label {
-        color: #666666 !important;
-        background: white !important;
-    }
-
-    [data-testid="stTextInput"] input {
-        background: #FAFAFA !important;
-        color: #1A1A1A !important;
-    }
-}
-
-/* Hide sidebar completely */
-[data-testid="stSidebar"] { display: none !important; }
-[data-testid="collapsedControl"] { display: none !important; }
-
-/* Hide streamlit chrome */
-#MainMenu { visibility: hidden; }
-footer { visibility: hidden; }
-header { visibility: hidden; }
-
-/* Main content full width */
-.block-container {
-    padding: 0 !important;
-    max-width: 100% !important;
-}
-
-/* Metric cards */
-[data-testid="metric-container"] {
-    background: white !important;
-    border: 1px solid #EBEBEB !important;
-    border-radius: 10px !important;
-    padding: 20px 18px !important;
-    position: relative;
-    overflow: hidden;
-    box-shadow: none !important;
-}
-
-[data-testid="metric-container"]::before {
-    content: '';
-    position: absolute;
-    top: 0; left: 20px; right: 20px;
-    height: 2px;
-    background: #B8860B;
-    border-radius: 0 0 2px 2px;
-}
-
-[data-testid="stMetricValue"] {
-    font-size: 1.7rem !important;
-    font-weight: 700 !important;
-    color: #1A1A1A !important;
-    letter-spacing: -1px !important;
-    font-family: 'Sora', sans-serif !important;
-}
-
-[data-testid="stMetricLabel"] {
-    font-size: 10px !important;
-    font-weight: 600 !important;
-    color: #999 !important;
-    text-transform: uppercase !important;
-    letter-spacing: 1.5px !important;
-    font-family: 'Sora', sans-serif !important;
-}
-
-[data-testid="stMetricDelta"] {
-    font-size: 11px !important;
-    font-family: 'Sora', sans-serif !important;
-}
-
-[data-testid="stMetricDelta"] svg { display: none !important; }
-
-/* Dataframes */
-[data-testid="stDataFrame"] {
-    border: 1px solid #EBEBEB !important;
-    border-radius: 8px !important;
-}
-
-/* Selectbox */
-.stSelectbox > div > div {
-    background: white !important;
-    border: 1px solid #EBEBEB !important;
-    border-radius: 6px !important;
-    color: #666 !important;
-    font-size: 12px !important;
-}
-
-/* Radio buttons */
-.stRadio > div {
-    display: flex !important;
-    flex-direction: row !important;
-    gap: 6px !important;
-    flex-wrap: wrap !important;
-}
-
-.stRadio label {
-    background: white !important;
-    border: 1px solid #EBEBEB !important;
-    border-radius: 20px !important;
-    padding: 5px 14px !important;
-    font-size: 12px !important;
-    color: #666 !important;
-    cursor: pointer !important;
-    transition: all 0.15s !important;
-}
-
-.stRadio label:has(input:checked) {
-    background: #FFFBEF !important;
-    border-color: #B8860B !important;
-    color: #B8860B !important;
-    font-weight: 600 !important;
-}
-
-/* Buttons */
-.stButton > button {
-    background: #1A1A1A !important;
-    color: white !important;
-    border: none !important;
-    border-radius: 6px !important;
-    font-size: 11px !important;
-    font-weight: 600 !important;
-    letter-spacing: 2px !important;
-    text-transform: uppercase !important;
-    padding: 10px 20px !important;
-    font-family: 'Sora', sans-serif !important;
-    transition: all 0.2s !important;
-}
-
-.stButton > button:hover {
-    background: #B8860B !important;
-    color: #1A1A1A !important;
-}
-
-/* Text inputs */
-.stTextInput > div > input {
-    background: #FAFAFA !important;
-    border: 1px solid #EBEBEB !important;
-    border-radius: 6px !important;
-    color: #1A1A1A !important;
-    font-size: 13px !important;
-    padding: 11px 14px !important;
-    font-family: 'Sora', sans-serif !important;
-}
-
-.stTextInput > div > input:focus {
-    border-color: #B8860B !important;
-    box-shadow: 0 0 0 3px rgba(184,134,11,0.08) !important;
-}
-
-.stTextInput label {
-    font-size: 10px !important;
-    font-weight: 600 !important;
-    color: #999 !important;
-    text-transform: uppercase !important;
-    letter-spacing: 1.5px !important;
-}
-
-/* Alert/error */
-.stAlert {
-    border-radius: 6px !important;
-    font-size: 13px !important;
-}
-</style>
-""", unsafe_allow_html=True)
-
-# ============================================================
-# DATABASE
-# ============================================================
-
-DB_PATH = os.path.join(
-    os.path.dirname(__file__),
-    "../pkomm_motors.duckdb"
+with open(os.path.join(HERE, "style.css")) as f:
+    # Markdown ends an HTML block at the first blank line, so squash the
+    # stylesheet onto one line before handing it over.
+    css = " ".join(line.strip() for line in f if line.strip())
+st.markdown(
+    '<link rel="preconnect" href="https://fonts.googleapis.com">'
+    '<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@500;600'
+    '&family=Jost:wght@400;500&display=swap" rel="stylesheet">'
+    f"<style>{css}</style>",
+    unsafe_allow_html=True,
 )
+
+
+def seal():
+    path = os.path.join(BRAND, "mark.svg")
+    if not os.path.exists(path):
+        return ""
+    with open(path) as f:
+        return f.read()
+
+
+NAVY, GOLD, GOLD_INK, MOTORS = "#0A0D16", "#C9AE72", "#8A7344", "#7A2E2A"
+GOOD, BAD, GRID, INK3 = "#2F6B45", "#A23B2E", "#EEEAE1", "#8A8F99"
+
+# What each number means. Shown when you hover the ? next to a metric.
+DEFINITIONS = {
+    "revenue": "Sum of sale prices for cars sold in the period. Uses the cleaned sales table, so rows with a zero or negative price are already gone.",
+    "units": "Number of sales in the period. One sale is one car.",
+    "avg_deal": "Revenue divided by cars sold.",
+    "financed": "Share of sales where the customer's loan was approved.",
+    "on_track": "Branches whose month-to-date revenue is on pace for their monthly target. Uses the whole current month, so the filters above don't change it.",
+    "target": "Monthly sales target for the branch, set in the branch table.",
+    "commission": "Revenue times the salesperson's commission rate.",
+    "best": "The single highest sale price in the period.",
+}
+
+
+# ------------------------------------------------------------
+# Data access
+# ------------------------------------------------------------
+
+def active_db():
+    run = st.session_state.get("run")
+    return run.db_path if run else SAMPLE_DB
+
 
 @st.cache_resource
-def get_connection():
-    return duckdb.connect(DB_PATH, read_only=True)
+def sample_connection():
+    return duckdb.connect(SAMPLE_DB, read_only=True)
 
-conn = get_connection()
 
-def query(sql):
-    return conn.execute(sql).df()
+def q(sql):
+    path = active_db()
+    if path == SAMPLE_DB:
+        return sample_connection().execute(sql).df()
+    con = duckdb.connect(path, read_only=True)
+    try:
+        return con.execute(sql).df()
+    finally:
+        con.close()
 
-# ============================================================
-# CHART THEME
-# ============================================================
 
-CHART = dict(
-    paper_bgcolor="rgba(0,0,0,0)",
-    plot_bgcolor="rgba(0,0,0,0)",
-    font=dict(color="#999", family="Sora", size=11),
-    margin=dict(t=10, b=10, l=10, r=10),
-    xaxis=dict(
-        gridcolor="#F5F5F5",
-        color="#BBB",
-        showline=False,
-        tickfont=dict(size=10)
-    ),
-    yaxis=dict(
-        gridcolor="#F5F5F5",
-        color="#BBB",
-        showline=False,
-        tickfont=dict(size=10)
-    ),
-    legend=dict(
-        bgcolor="rgba(0,0,0,0)",
-        font=dict(color="#999", size=10)
-    )
-)
+def one(sql):
+    return q(sql).iloc[0, 0]
 
-GOLD = "#B8860B"
-GOLD_BG = "#FFFBEF"
-GREEN = "#16A34A"
-RED = "#DC2626"
-CHARCOAL = "#1A1A1A"
-
-# ============================================================
-# USERS
-# ============================================================
 
 @st.cache_data
-def load_salespeople():
-    return conn.execute("""
-        SELECT employee_id, full_name, location_id
-        FROM main_silver.stg_employees
-        WHERE is_salesperson = TRUE
-        ORDER BY full_name
-    """).df()
+def salespeople(path):
+    con = duckdb.connect(path, read_only=True)
+    try:
+        return con.execute("""
+            SELECT employee_id, full_name, location_id
+            FROM main_silver.stg_employees
+            WHERE is_salesperson = TRUE
+            ORDER BY full_name
+        """).df()
+    finally:
+        con.close()
 
-LOCATION_MAP = {
-    "All Locations": None,
-    "Dallas": "LOC001",
-    "Chicago": "LOC002",
-    "Atlanta": "LOC003",
-    "Phoenix": "LOC004",
-    "Seattle": "LOC005"
-}
 
-USERS = {
-    "exec001": {"password": "exec001", "role": "Executive",
-                "name": "Prameel Kommineni", "location_id": None,
-                "employee_id": None, "city": None},
-    "mgr001": {"password": "mgr001", "role": "Branch Manager",
-               "name": "Marcus Johnson", "location_id": "LOC001",
-               "employee_id": None, "city": "Dallas"},
-    "mgr002": {"password": "mgr002", "role": "Branch Manager",
-               "name": "Sarah Mitchell", "location_id": "LOC002",
-               "employee_id": None, "city": "Chicago"},
-    "mgr003": {"password": "mgr003", "role": "Branch Manager",
-               "name": "David Reyes", "location_id": "LOC003",
-               "employee_id": None, "city": "Atlanta"},
-    "mgr004": {"password": "mgr004", "role": "Branch Manager",
-               "name": "Linda Park", "location_id": "LOC004",
-               "employee_id": None, "city": "Phoenix"},
-    "mgr005": {"password": "mgr005", "role": "Branch Manager",
-               "name": "James Okafor", "location_id": "LOC005",
-               "employee_id": None, "city": "Seattle"},
-}
+def data_through():
+    """Latest sale date in the data. Periods count back from here, not from
+    today, so the views still work when the data is a few days old."""
+    return pd.to_datetime(one("SELECT MAX(sale_date_only) FROM main_silver.stg_sales_transactions")).date()
 
-sp_df = load_salespeople()
-for _, row in sp_df.iterrows():
-    USERS[row["employee_id"]] = {
-        "password": row["employee_id"],
-        "role": "Salesperson",
-        "name": row["full_name"],
-        "location_id": row["location_id"],
-        "employee_id": row["employee_id"],
-        "city": None
-    }
 
-# ============================================================
-# SESSION STATE
-# ============================================================
+def built_at():
+    return pd.to_datetime(one("SELECT MAX(_ingested_at) FROM main_silver.stg_sales_transactions"))
 
-if "logged_in" not in st.session_state:
-    st.session_state.logged_in = False
-if "user" not in st.session_state:
-    st.session_state.user = None
 
-# ============================================================
-# HELPERS
-# ============================================================
+# ------------------------------------------------------------
+# Users. Demo logins, password is the same as the ID.
+# ------------------------------------------------------------
 
-def section_title(text):
-    st.markdown(
-        f'<p style="font-size:10px;font-weight:600;color:#999;'
-        f'text-transform:uppercase;letter-spacing:1.5px;'
-        f'margin:0 0 14px 0">{text}</p>',
-        unsafe_allow_html=True
+BRANCHES = {"Dallas": "LOC001", "Chicago": "LOC002", "Atlanta": "LOC003",
+            "Phoenix": "LOC004", "Seattle": "LOC005"}
+
+USERS = {"exec001": {"role": "Executive", "name": "Group leadership", "location_id": None, "city": None}}
+for i, (city, loc) in enumerate(BRANCHES.items(), start=1):
+    USERS[f"mgr00{i}"] = {"role": "Branch Manager", "name": f"{city} branch", "location_id": loc, "city": city}
+
+sp = salespeople(SAMPLE_DB)
+for _, r in sp.iterrows():
+    USERS[r["employee_id"]] = {"role": "Salesperson", "name": r["full_name"],
+                               "location_id": r["location_id"], "employee_id": r["employee_id"], "city": None}
+
+
+def sign_in(user_id):
+    st.session_state.user = dict(USERS[user_id], user_id=user_id)
+
+
+def sign_out():
+    pipeline.cleanup(st.session_state.get("run"))
+    for k in ("user", "run"):
+        st.session_state.pop(k, None)
+
+
+# ------------------------------------------------------------
+# Small helpers
+# ------------------------------------------------------------
+
+def money(v):
+    return f"${v:,.0f}"
+
+
+def chart(fig, height):
+    fig.update_layout(
+        height=height, margin=dict(t=8, b=8, l=8, r=8),
+        paper_bgcolor="rgba(0,0,0,0)", plot_bgcolor="rgba(0,0,0,0)",
+        font=dict(family="Jost, sans-serif", size=12, color="#5A5F6B"),
+        xaxis=dict(gridcolor=GRID, zeroline=False, showline=False),
+        yaxis=dict(gridcolor=GRID, zeroline=False, showline=False),
+        legend=dict(orientation="h", y=1.08, x=0, bgcolor="rgba(0,0,0,0)"),
+        hoverlabel=dict(font_family="Jost, sans-serif"),
     )
+    st.plotly_chart(fig, use_container_width=True, config={"displayModeBar": False})
 
-def card_start():
-    st.markdown(
-        '<div style="background:white;border:1px solid #EBEBEB;'
-        'border-radius:10px;padding:24px">',
-        unsafe_allow_html=True
-    )
 
-def card_end():
-    st.markdown('</div>', unsafe_allow_html=True)
+def head(title, text):
+    st.markdown(f'<div class="pk-head"><h2>{title}</h2><p>{text}</p></div>', unsafe_allow_html=True)
 
-def kpi_card(label, value, sub=None, sub_color="#999"):
-    return f"""
-    <div style="background:white;border:1px solid #EBEBEB;
-                border-radius:10px;padding:20px 18px;
-                position:relative;overflow:hidden;
-                transition:box-shadow 0.2s">
-        <div style="position:absolute;top:0;left:20px;right:20px;
-                    height:2px;background:{GOLD};
-                    border-radius:0 0 2px 2px"></div>
-        <p style="font-size:10px;font-weight:600;color:#999;
-                  text-transform:uppercase;letter-spacing:1.5px;
-                  margin:0 0 10px 0">{label}</p>
-        <p style="font-size:1.65rem;font-weight:700;color:#1A1A1A;
-                  letter-spacing:-1px;margin:0;line-height:1">{value}</p>
-        {f'<p style="font-size:11px;color:{sub_color};margin:6px 0 0 0;font-weight:500">{sub}</p>' if sub else ''}
-    </div>
-    """
 
-def divider():
-    st.markdown(
-        '<div style="height:1px;background:#EBEBEB;margin:20px 0"></div>',
-        unsafe_allow_html=True
-    )
+def sub(text):
+    st.markdown(f'<div class="pk-sub">{text}</div>', unsafe_allow_html=True)
 
-def build_where(f, a="s"):
-    parts = [
-        f"{a}.sale_date_only >= '{f['start_date']}'",
-        f"{a}.sale_date_only <= '{f['end_date']}'"
-    ]
+
+def where(f, a="s"):
+    parts = [f"{a}.sale_date_only BETWEEN '{f['start']}' AND '{f['end']}'"]
     if f.get("location_id"):
         parts.append(f"{a}.location_id = '{f['location_id']}'")
-    if f.get("sales_type") == "Financed":
+    if f.get("make"):
+        parts.append(f"{a}.vehicle_id IN (SELECT vehicle_id FROM main_silver.stg_vehicles WHERE make = '{f['make']}')")
+    if f.get("sale_type") == "Financed":
         parts.append(f"{a}.financing_approved = TRUE")
-    elif f.get("sales_type") == "Cash":
+    elif f.get("sale_type") == "Cash":
         parts.append(f"{a}.financing_approved = FALSE")
-    if f.get("salesperson_id"):
-        parts.append(f"{a}.employee_id = '{f['salesperson_id']}'")
-    return "WHERE " + " AND ".join(parts)
+    if f.get("employee_id"):
+        parts.append(f"{a}.employee_id = '{f['employee_id']}'")
+    return " AND ".join(parts)
 
-# ============================================================
-# LOGIN
-# ============================================================
+
+# ------------------------------------------------------------
+# Login
+# ------------------------------------------------------------
 
 def show_login():
-    # center column
-    col1, col2, col3 = st.columns([1, 1.2, 1])
-    with col2:
-        st.markdown("<div style='height:60px'></div>", unsafe_allow_html=True)
+    # Kept on joined lines on purpose: Markdown turns indented HTML into a code block.
+    st.markdown(
+        f'<div class="pk-login">{seal()}'
+        '<h1>Pkomm Motors</h1>'
+        '<p>Five dealerships in Dallas, Chicago, Atlanta, Phoenix and Seattle. Pkomm Motors is a '
+        'fictional company built to practise real data engineering, and every number here is simulated.</p>'
+        '<p class="pk-quiet" style="margin-top:22px">Pick a role to look around. Each one sees different data.</p>'
+        '</div>',
+        unsafe_allow_html=True,
+    )
+    _, a, b, c, _ = st.columns([1.2, 1, 1, 1, 1.2])
+    if a.button("Executive", use_container_width=True, type="primary"):
+        sign_in("exec001"); st.rerun()
+    if b.button("Branch manager", use_container_width=True):
+        sign_in("mgr002"); st.rerun()
+    if c.button("Salesperson", use_container_width=True):
+        sign_in(sp.iloc[0]["employee_id"]); st.rerun()
 
-        # brand
-        st.markdown("""
-        <div style="text-align:center;margin-bottom:32px">
-            <p style="font-size:22px;font-weight:700;color:#1A1A1A;
-                      letter-spacing:-0.5px;margin:0">
-                Pkomm Motors
-            </p>
-            <div style="width:32px;height:2px;background:#B8860B;
-                        margin:10px auto"></div>
-            <p style="font-size:10px;color:#999;letter-spacing:2.5px;
-                      text-transform:uppercase;margin:0;font-weight:600">
-                Performance Intelligence
-            </p>
-            <p style="font-size:11px;color:#888;margin:14px 0 0">
-                A fictional company. All data is simulated.
-            </p>
-        </div>
-        """, unsafe_allow_html=True)
-
-        # sign in label
-        st.markdown("""
-        <p style="font-size:16px;font-weight:600;color:#1A1A1A;
-                  margin:0 0 4px 0">Sign In</p>
-        <p style="font-size:12px;color:#999;margin:0 0 20px 0">
-            Enter your credentials to continue
-        </p>
-        """, unsafe_allow_html=True)
-
-        # inputs and button — pure streamlit, no wrapping divs
-        user_id = st.text_input(
-            "User ID", placeholder="exec001 · mgr001 · EMP001"
-        )
-        password = st.text_input(
-            "Password", type="password", placeholder="Password = User ID"
-        )
-
-        st.markdown("<div style='height:8px'></div>", unsafe_allow_html=True)
-
-        if st.button("Sign In", use_container_width=True):
-            if user_id in USERS and USERS[user_id]["password"] == password:
-                st.session_state.logged_in = True
-                st.session_state.user = USERS[user_id]
-                st.session_state.user["user_id"] = user_id
-                st.rerun()
+    _, mid, _ = st.columns([1.4, 2, 1.4])
+    with mid.expander("Sign in with a demo ID instead"):
+        uid = st.text_input("User ID", placeholder="exec001, mgr001 to mgr005, EMP001 to EMP020")
+        pw = st.text_input("Password", type="password", placeholder="Same as the user ID")
+        if st.button("Sign in", use_container_width=True):
+            if uid in USERS and pw == uid:
+                sign_in(uid); st.rerun()
             else:
-                st.error("Invalid credentials.")
+                st.error("That ID and password don't match. The password is the same as the ID.")
 
-        st.markdown("""
-        <div style="margin-top:24px;padding-top:20px;
-                    border-top:1px solid #EBEBEB;text-align:center">
-            <p style="font-size:10px;color:#CCC;letter-spacing:1.5px;
-                      text-transform:uppercase;margin:0 0 8px 0">
-                Demo Access
-            </p>
-            <p style="font-size:12px;color:#999;margin:0;line-height:2.2">
-                Executive
-                <code style="background:#FFFBEF;color:#B8860B;
-                             padding:1px 6px;border-radius:3px;
-                             font-size:10px">exec001</code><br>
-                Managers
-                <code style="background:#FFFBEF;color:#B8860B;
-                             padding:1px 6px;border-radius:3px;
-                             font-size:10px">mgr001 – mgr005</code><br>
-                Salespeople
-                <code style="background:#FFFBEF;color:#B8860B;
-                             padding:1px 6px;border-radius:3px;
-                             font-size:10px">EMP001 – EMP020</code>
-            </p>
-        </div>
-        """, unsafe_allow_html=True)
-# ============================================================
-# TOP NAV
-# ============================================================
 
-def show_topnav(user):
-    st.markdown(f"""
-    <div style="background:white;border-bottom:1px solid #EBEBEB;
-                padding:0 48px;display:flex;align-items:center;
-                justify-content:space-between;height:56px;
-                position:sticky;top:0;z-index:100;
-                margin:-1rem -1rem 0 -1rem">
-        <div style="display:flex;align-items:center;gap:10px">
-            <div style="width:6px;height:6px;background:#B8860B;
-                        border-radius:50%"></div>
-            <span style="font-size:14px;font-weight:700;
-                         color:#1A1A1A;letter-spacing:-0.3px">
-                Pkomm Motors
-            </span>
-            <span style="font-size:11px;color:#999">
-                fictional company, simulated data
-            </span>
-        </div>
-        <div style="display:flex;align-items:center;gap:20px">
-            <div style="text-align:right">
-                <p style="font-size:12px;font-weight:500;
-                          color:#1A1A1A;margin:0">{user['name']}</p>
-                <p style="font-size:10px;color:#999;letter-spacing:1.5px;
-                          text-transform:uppercase;margin:0">{user['role']}</p>
-            </div>
-            <div style="display:flex;align-items:center;gap:5px;
-                        background:#F0FDF4;border:1px solid #BBF7D0;
-                        border-radius:20px;padding:4px 10px">
-                <div style="width:5px;height:5px;background:#16A34A;
-                            border-radius:50%"></div>
-                <span style="font-size:10px;color:#16A34A;
-                             font-weight:600">Live</span>
-            </div>
-        </div>
-    </div>
-    """, unsafe_allow_html=True)
+# ------------------------------------------------------------
+# Top bar
+# ------------------------------------------------------------
 
-# ============================================================
-# FILTERS BAR
-# ============================================================
+def show_bar(user):
+    run = st.session_state.get("run")
+    if run:
+        mins = int((time.time() - run.finished_at) // 60)
+        ago = "just now" if mins < 1 else f"{mins} min ago"
+        fresh = f'<span class="pk-fresh run"><i></i>Your run, built {ago}</span>'
+    else:
+        fresh = f'<span class="pk-fresh"><i></i>Sample data, built {built_at():%b %-d}</span>'
+    role = {"Executive": "Executive, all branches",
+            "Branch Manager": f"Branch manager, {user.get('city')}",
+            "Salesperson": "Salesperson"}[user["role"]]
+    left, right = st.columns([5, 1])
+    left.markdown(
+        f'<div class="pk-bar"><div class="pk-brand">{seal()}<div>'
+        '<div class="name">Pkomm Motors</div>'
+        '<div class="note">A fictional company. All data is simulated.</div></div></div>'
+        f'<div class="pk-meta">{fresh}<span><b>{html.escape(user["name"])}</b> &middot; {role}</span></div></div>',
+        unsafe_allow_html=True,
+    )
+    with right:
+        st.write("")
+        if st.button("Sign out", use_container_width=True):
+            sign_out(); st.rerun()
+
+
+# ------------------------------------------------------------
+# Filters
+# ------------------------------------------------------------
 
 def show_filters(user):
-    st.markdown("""
-    <div style="background:white;border-bottom:1px solid #EBEBEB;
-                padding:12px 48px;margin:0 -1rem;
-                display:flex;align-items:center;gap:8px;
-                overflow-x:auto">
-    </div>
-    """, unsafe_allow_html=True)
-
-    today = date.today()
-
-    with st.container():
-        col1, col2, col3, col4, col5, col6, col7 = st.columns(
-            [0.8, 1.8, 0.1, 1.2, 0.1, 1.2, 1.2]
-        )
-
-        with col1:
-            st.markdown(
-                '<p style="font-size:10px;font-weight:600;color:#999;'
-                'text-transform:uppercase;letter-spacing:1.5px;'
-                'margin:8px 0 4px 0">Period</p>',
-                unsafe_allow_html=True
-            )
-
-        with col2:
-            date_option = st.radio(
-                "Period",
-                ["7 Days", "30 Days", "This Month"],
-                index=1,
-                horizontal=True,
-                label_visibility="collapsed"
-            )
-
-        with col3:
-            st.markdown(
-                '<div style="height:36px;width:1px;background:#EBEBEB;'
-                'margin-top:4px"></div>',
-                unsafe_allow_html=True
-            )
-
-        with col4:
-            if user["role"] == "Executive":
-                location_filter = st.selectbox(
-                    "Location",
-                    list(LOCATION_MAP.keys()),
-                    label_visibility="collapsed"
-                )
-                location_id_filter = LOCATION_MAP[location_filter]
-            else:
-                location_id_filter = user.get("location_id")
-                st.markdown(
-                    f'<p style="font-size:12px;color:#666;'
-                    f'margin:8px 0 0 0">'
-                    f'{user.get("city", "")} Branch</p>',
-                    unsafe_allow_html=True
-                )
-
-        with col5:
-            st.markdown(
-                '<div style="height:36px;width:1px;background:#EBEBEB;'
-                'margin-top:4px"></div>',
-                unsafe_allow_html=True
-            )
-
-        with col6:
-            makes = query("""
-                SELECT DISTINCT make FROM main_silver.stg_vehicles
-                ORDER BY make
-            """)["make"].tolist()
-            make_filter = st.selectbox(
-                "Make",
-                ["All Makes"] + makes,
-                label_visibility="collapsed"
-            )
-            selected_make = (
-                None if make_filter == "All Makes" else make_filter
-            )
-
-        with col7:
-            sales_type = st.radio(
-                "Sale Type",
-                ["All", "Financed", "Cash"],
-                horizontal=True,
-                label_visibility="collapsed"
-            )
-
-    if date_option == "7 Days":
-        start_date = today - timedelta(days=7)
-        end_date = today
-    elif date_option == "30 Days":
-        start_date = today - timedelta(days=30)
-        end_date = today
-    else:
-        start_date = today.replace(day=1)
-        end_date = today
-
-    sp_filter = None
-    if user["role"] in ["Executive", "Branch Manager"]:
-        with st.container():
-            col1, col2, col3 = st.columns([1, 2, 4])
-            with col1:
-                st.markdown(
-                    '<p style="font-size:10px;font-weight:600;color:#999;'
-                    'text-transform:uppercase;letter-spacing:1.5px;'
-                    'margin:4px 0">Salesperson</p>',
-                    unsafe_allow_html=True
-                )
-            with col2:
-                if user["role"] == "Branch Manager":
-                    sp_options = sp_df[
-                        sp_df["location_id"] == user["location_id"]
-                    ]["full_name"].tolist()
-                else:
-                    sp_options = sp_df["full_name"].tolist()
-
-                sp_choice = st.selectbox(
-                    "Salesperson",
-                    ["All Salespeople"] + sp_options,
-                    label_visibility="collapsed"
-                )
-                if sp_choice != "All Salespeople":
-                    sp_filter = sp_df[
-                        sp_df["full_name"] == sp_choice
-                    ]["employee_id"].values[0]
-
-    return {
-        "start_date": start_date,
-        "end_date": end_date,
-        "location_id": location_id_filter,
-        "make": selected_make,
-        "sales_type": sales_type,
-        "salesperson_id": sp_filter
-    }
-
-# ============================================================
-# EXECUTIVE DASHBOARD
-# ============================================================
-
-def show_executive(f):
-    loc_label = "All Locations"
-    if f.get("location_id"):
-        loc_label = [
-            k for k, v in LOCATION_MAP.items()
-            if v == f["location_id"]
-        ][0]
-
-    st.markdown(f"""
-    <div style="padding:32px 48px 20px 48px;margin:0 -1rem">
-        <p style="font-size:1.5rem;font-weight:700;color:#1A1A1A;
-                  letter-spacing:-0.5px;margin:0">
-            Executive <span style="color:#B8860B">Overview</span>
-        </p>
-        <p style="font-size:12px;color:#999;margin:4px 0 0 0">
-            {loc_label} &nbsp;·&nbsp;
-            {f['start_date'].strftime('%b %d')} –
-            {f['end_date'].strftime('%b %d, %Y')}
-        </p>
-    </div>
-    """, unsafe_allow_html=True)
-
-    where = build_where(f)
-
-    rev = query(f"""
-        SELECT COALESCE(SUM(s.sale_price), 0) as v
-        FROM main_silver.stg_sales_transactions s {where}
-    """)["v"].values[0]
-
-    units = int(query(f"""
-        SELECT COUNT(*) as v
-        FROM main_silver.stg_sales_transactions s {where}
-    """)["v"].values[0])
-
-    avg_deal = (rev / units) if units > 0 else 0
-
-    financed = int(query(f"""
-        SELECT COUNT(*) as v
-        FROM main_silver.stg_sales_transactions s
-        WHERE s.sale_date_only >= '{f['start_date']}'
-        AND s.sale_date_only <= '{f['end_date']}'
-        {"AND s.location_id = '" + f['location_id'] + "'" if f.get('location_id') else ""}
-        AND s.financing_approved = TRUE
-    """)["v"].values[0])
-
-    fin_rate = (financed / units * 100) if units > 0 else 0
-
-    on_track = int(query("""
-        SELECT COUNT(*) as v FROM main_gold.revenue_vs_target
-        WHERE status = 'On Track'
-    """)["v"].values[0])
-
-    target_total = query("""
-        SELECT COALESCE(SUM(monthly_target), 0) as v
-        FROM main_gold.revenue_vs_target
-    """)["v"].values[0]
-
-    pct = (rev / target_total * 100) if target_total > 0 else 0
-
-    # KPI Cards
-    c1, c2, c3, c4, c5 = st.columns(5)
-    with c1:
-        st.markdown(kpi_card(
-            "Total Revenue", f"${rev:,.0f}",
-            f"{pct:.1f}% of target", GOLD
-        ), unsafe_allow_html=True)
-    with c2:
-        st.markdown(kpi_card(
-            "Units Sold", str(units),
-            f"avg ${avg_deal:,.0f} / deal"
-        ), unsafe_allow_html=True)
-    with c3:
-        st.markdown(kpi_card(
-            "Avg Deal Size", f"${avg_deal:,.0f}"
-        ), unsafe_allow_html=True)
-    with c4:
-        st.markdown(kpi_card(
-            "Financing Rate", f"{fin_rate:.1f}%",
-            f"{financed} financed deals"
-        ), unsafe_allow_html=True)
-    with c5:
-        st.markdown(kpi_card(
-            "On Track", f"{on_track} / 5",
-            "branches hitting target",
-            GREEN if on_track >= 3 else RED
-        ), unsafe_allow_html=True)
-
-    divider()
-
-    # Revenue chart + progress bars
-    col1, col2 = st.columns([3, 2])
-
-    with col1:
-        section_title("Revenue by Location")
-        rev_loc = query(f"""
-            SELECT l.city,
-                   COALESCE(SUM(s.sale_price), 0) as revenue,
-                   l.monthly_target
-            FROM main_silver.stg_locations l
-            LEFT JOIN main_silver.stg_sales_transactions s
-                ON l.location_id = s.location_id
-                AND s.sale_date_only >= '{f['start_date']}'
-                AND s.sale_date_only <= '{f['end_date']}'
-                {"AND l.location_id = '" + f['location_id'] + "'" if f.get('location_id') else ""}
-            GROUP BY l.city, l.monthly_target
-            ORDER BY revenue DESC
-        """)
-        fig = go.Figure()
-        fig.add_bar(
-            name="Revenue",
-            x=rev_loc["city"],
-            y=rev_loc["revenue"],
-            marker=dict(color=GOLD, opacity=0.9),
-            text=[f"${v/1e6:.2f}M" for v in rev_loc["revenue"]],
-            textposition="outside",
-            textfont=dict(size=10, color=GOLD)
-        )
-        fig.add_bar(
-            name="Target",
-            x=rev_loc["city"],
-            y=rev_loc["monthly_target"],
-            marker=dict(
-                color="rgba(0,0,0,0)",
-                line=dict(color="#DDD", width=1.5)
-            )
-        )
-        fig.update_layout(
-            barmode="overlay",
-            height=260,
-            showlegend=True,
-            **CHART
-        )
-        st.plotly_chart(fig, use_container_width=True)
-
-    with col2:
-        section_title("Target Achievement")
-        tgt = query("""
-            SELECT city, pct_of_target, status
-            FROM main_gold.revenue_vs_target
-            ORDER BY pct_of_target DESC
-        """)
-        for _, row in tgt.iterrows():
-            on = row["status"] == "On Track"
-            color = GREEN if on else RED
-            pct_display = min(row["pct_of_target"], 100)
-            st.markdown(f"""
-            <div style="margin-bottom:16px">
-                <div style="display:flex;justify-content:space-between;
-                            margin-bottom:6px">
-                    <span style="font-size:12px;color:#1A1A1A;
-                                 font-weight:500">{row['city']}</span>
-                    <span style="font-size:11px;color:{color};
-                                 font-weight:600;
-                                 font-family:'JetBrains Mono',monospace">
-                        {row['pct_of_target']:.1f}%
-                    </span>
-                </div>
-                <div style="height:5px;background:#F0F0F0;
-                            border-radius:3px;overflow:hidden">
-                    <div style="height:100%;width:{pct_display}%;
-                                background:{color};border-radius:3px">
-                    </div>
-                </div>
-            </div>
-            """, unsafe_allow_html=True)
-
-    divider()
-
-    # Trend
-    section_title("Daily Revenue Trend")
-    trend = query(f"""
-        SELECT s.sale_date_only as dt, SUM(s.sale_price) as revenue
-        FROM main_silver.stg_sales_transactions s {where}
-        GROUP BY dt ORDER BY dt
-    """)
-    fig2 = go.Figure()
-    fig2.add_scatter(
-        x=trend["dt"],
-        y=trend["revenue"],
-        fill="tozeroy",
-        fillcolor="rgba(184,134,11,0.06)",
-        line=dict(color=GOLD, width=2),
-        mode="lines",
-        name="Revenue"
-    )
-    fig2.update_layout(height=180, **CHART)
-    st.plotly_chart(fig2, use_container_width=True)
-
-    divider()
-
-    # Leaderboard + Status
-    col1, col2 = st.columns([3, 2])
-
-    with col1:
-        section_title("Salesperson Leaderboard")
-        sp_parts = [
-            f"s.sale_date_only >= '{f['start_date']}'",
-            f"s.sale_date_only <= '{f['end_date']}'"
-        ]
-        if f.get("location_id"):
-            sp_parts.append(f"s.location_id = '{f['location_id']}'")
-        if f.get("salesperson_id"):
-            sp_parts.append(f"e.employee_id = '{f['salesperson_id']}'")
-        sp_where = "WHERE " + " AND ".join(sp_parts)
-
-        board = query(f"""
-            SELECT
-                ROW_NUMBER() OVER (
-                    ORDER BY SUM(s.sale_price) DESC
-                ) as Rank,
-                e.full_name as Name,
-                l.city as Branch,
-                COUNT(s.transaction_id) as Deals,
-                ROUND(SUM(s.sale_price), 0) as Revenue,
-                ROUND(SUM(s.sale_price) * e.commission_rate, 0) as Commission
-            FROM main_silver.stg_employees e
-            LEFT JOIN main_silver.stg_sales_transactions s
-                ON e.employee_id = s.employee_id
-            LEFT JOIN main_silver.stg_locations l
-                ON e.location_id = l.location_id
-            {sp_where} AND e.is_salesperson = TRUE
-            GROUP BY e.employee_id, e.full_name,
-                     l.city, e.commission_rate
-            HAVING COUNT(s.transaction_id) > 0
-            ORDER BY Revenue DESC
-            LIMIT 10
-        """)
-        st.dataframe(board, use_container_width=True, hide_index=True)
-
-    with col2:
-        section_title("Branch Status")
-        status_df = query("""
-            SELECT city as Branch,
-                   revenue_to_date as Revenue,
-                   status as Status
-            FROM main_gold.revenue_vs_target
-            ORDER BY revenue_to_date DESC
-        """)
-        st.dataframe(
-            status_df, use_container_width=True, hide_index=True
-        )
-
-    # Sign out button
-    divider()
-    col1, col2, col3 = st.columns([4, 1, 4])
-    with col2:
-        if st.button("Sign Out", use_container_width=True):
-            st.session_state.logged_in = False
-            st.session_state.user = None
-            st.rerun()
-
-# ============================================================
-# BRANCH MANAGER
-# ============================================================
-
-def show_branch_manager(user, f):
-    location_id = user["location_id"]
-    city = user["city"]
-
-    st.markdown(f"""
-    <div style="padding:32px 48px 20px 48px;margin:0 -1rem">
-        <p style="font-size:1.5rem;font-weight:700;color:#1A1A1A;
-                  letter-spacing:-0.5px;margin:0">
-            {city} <span style="color:#B8860B">Branch</span>
-        </p>
-        <p style="font-size:12px;color:#999;margin:4px 0 0 0">
-            {user['name']} &nbsp;·&nbsp;
-            {f['start_date'].strftime('%b %d')} –
-            {f['end_date'].strftime('%b %d, %Y')}
-        </p>
-    </div>
-    """, unsafe_allow_html=True)
-
-    where = build_where(f)
-
-    rev = query(f"""
-        SELECT COALESCE(SUM(s.sale_price), 0) as v
-        FROM main_silver.stg_sales_transactions s {where}
-    """)["v"].values[0]
-
-    units = int(query(f"""
-        SELECT COUNT(*) as v
-        FROM main_silver.stg_sales_transactions s {where}
-    """)["v"].values[0])
-
-    tgt_row = query(f"""
-        SELECT monthly_target, pct_of_target, status
-        FROM main_gold.revenue_vs_target
-        WHERE location_id = '{location_id}'
-    """)
-
-    c1, c2, c3, c4 = st.columns(4)
-    with c1:
-        st.markdown(kpi_card(
-            "Revenue", f"${rev:,.0f}", "period total"
-        ), unsafe_allow_html=True)
-    with c2:
-        st.markdown(kpi_card(
-            "Units Sold", str(units)
-        ), unsafe_allow_html=True)
-
-    if len(tgt_row) > 0:
-        row = tgt_row.iloc[0]
-        with c3:
-            st.markdown(kpi_card(
-                "Monthly Target",
-                f"${row['monthly_target']:,.0f}",
-                f"{row['pct_of_target']:.1f}% achieved",
-                GREEN if row["pct_of_target"] >= 80 else RED
-            ), unsafe_allow_html=True)
-        with c4:
-            on = row["status"] == "On Track"
-            st.markdown(kpi_card(
-                "Status",
-                "On Track" if on else "Behind",
-                sub_color=GREEN if on else RED
-            ), unsafe_allow_html=True)
-
-    divider()
-
-    col1, col2 = st.columns([3, 2])
-
-    with col1:
-        section_title("Daily Revenue")
-        trend = query(f"""
-            SELECT s.sale_date_only as dt, SUM(s.sale_price) as revenue
-            FROM main_silver.stg_sales_transactions s {where}
-            GROUP BY dt ORDER BY dt
-        """)
-        fig = go.Figure()
-        fig.add_bar(
-            x=trend["dt"],
-            y=trend["revenue"],
-            marker=dict(color=GOLD, opacity=0.85)
-        )
-        fig.update_layout(height=240, **CHART)
-        st.plotly_chart(fig, use_container_width=True)
-
-    with col2:
-        section_title("Team Performance")
-        sp_parts = [
-            f"s.sale_date_only >= '{f['start_date']}'",
-            f"s.sale_date_only <= '{f['end_date']}'",
-            f"e.location_id = '{location_id}'"
-        ]
-        if f.get("salesperson_id"):
-            sp_parts.append(
-                f"e.employee_id = '{f['salesperson_id']}'"
-            )
-        sp_where = "WHERE " + " AND ".join(sp_parts)
-
-        team = query(f"""
-            SELECT e.full_name as Name,
-                   COUNT(s.transaction_id) as Deals,
-                   ROUND(COALESCE(SUM(s.sale_price), 0), 0) as Revenue
-            FROM main_silver.stg_employees e
-            LEFT JOIN main_silver.stg_sales_transactions s
-                ON e.employee_id = s.employee_id
-            {sp_where} AND e.is_salesperson = TRUE
-            GROUP BY e.employee_id, e.full_name
-            ORDER BY Revenue DESC
-        """)
-        st.dataframe(team, use_container_width=True, hide_index=True)
-
-    divider()
-
-    col1, col2 = st.columns(2)
-    with col1:
-        section_title("Inventory")
-        inv = query(f"""
-            SELECT make as Make, status as Status,
-                   COUNT(*) as Count,
-                   ROUND(AVG(list_price), 0) as Avg_Price
-            FROM main_silver.stg_vehicles
-            WHERE location_id = '{location_id}'
-            {"AND make = '" + f['make'] + "'" if f.get('make') else ""}
-            GROUP BY make, status ORDER BY make
-        """)
-        st.dataframe(inv, use_container_width=True, hide_index=True)
-
-    with col2:
-        section_title("Service Center")
-        svc = query(f"""
-            SELECT e.full_name as Technician,
-                   COUNT(j.job_id) as Jobs,
-                   ROUND(COALESCE(SUM(j.labor_revenue), 0), 0) as Revenue,
-                   ROUND(AVG(j.efficiency_ratio), 2) as Efficiency
-            FROM main_silver.stg_employees e
-            LEFT JOIN main_silver.stg_service_jobs j
-                ON e.employee_id = j.technician_id
-                AND j.job_date_only >= '{f['start_date']}'
-                AND j.job_date_only <= '{f['end_date']}'
-            WHERE e.location_id = '{location_id}'
-            AND e.is_salesperson = FALSE
-            GROUP BY e.employee_id, e.full_name
-            ORDER BY Revenue DESC
-        """)
-        st.dataframe(svc, use_container_width=True, hide_index=True)
-
-    divider()
-    col1, col2, col3 = st.columns([4, 1, 4])
-    with col2:
-        if st.button("Sign Out", use_container_width=True):
-            st.session_state.logged_in = False
-            st.session_state.user = None
-            st.rerun()
-
-# ============================================================
-# SALESPERSON
-# ============================================================
-
-def show_salesperson(user, f):
-    employee_id = user["employee_id"]
-
-    st.markdown(f"""
-    <div style="padding:32px 48px 20px 48px;margin:0 -1rem">
-        <p style="font-size:1.5rem;font-weight:700;color:#1A1A1A;
-                  letter-spacing:-0.5px;margin:0">
-            {user['name'].split()[0]}
-            <span style="color:#B8860B">Performance</span>
-        </p>
-        <p style="font-size:12px;color:#999;margin:4px 0 0 0">
-            {f['start_date'].strftime('%b %d')} –
-            {f['end_date'].strftime('%b %d, %Y')}
-        </p>
-    </div>
-    """, unsafe_allow_html=True)
-
-    stats = query(f"""
-        SELECT COUNT(*) as deals,
-               COALESCE(SUM(sale_price), 0) as revenue,
-               COALESCE(AVG(sale_price), 0) as avg_deal,
-               COALESCE(MAX(sale_price), 0) as best_deal
-        FROM main_silver.stg_sales_transactions
-        WHERE employee_id = '{employee_id}'
-        AND sale_date_only >= '{f['start_date']}'
-        AND sale_date_only <= '{f['end_date']}'
-    """)
-
-    emp = query(f"""
-        SELECT commission_rate FROM main_silver.stg_employees
-        WHERE employee_id = '{employee_id}'
-    """)
-
-    if len(stats) > 0 and len(emp) > 0:
-        r = stats.iloc[0]
-        rate = emp.iloc[0]["commission_rate"]
-        commission = r["revenue"] * rate
-
-        c1, c2, c3, c4, c5 = st.columns(5)
-        with c1:
-            st.markdown(kpi_card(
-                "Deals Closed", str(int(r["deals"]))
-            ), unsafe_allow_html=True)
-        with c2:
-            st.markdown(kpi_card(
-                "Revenue", f"${r['revenue']:,.0f}"
-            ), unsafe_allow_html=True)
-        with c3:
-            st.markdown(kpi_card(
-                "Commission", f"${commission:,.0f}",
-                f"{rate*100:.1f}% rate", GOLD
-            ), unsafe_allow_html=True)
-        with c4:
-            st.markdown(kpi_card(
-                "Avg Deal", f"${r['avg_deal']:,.0f}"
-            ), unsafe_allow_html=True)
-        with c5:
-            st.markdown(kpi_card(
-                "Best Sale", f"${r['best_deal']:,.0f}"
-            ), unsafe_allow_html=True)
-
-    divider()
-
-    col1, col2 = st.columns([2, 3])
-    with col1:
-        section_title("Company Ranking")
-        rank = query(f"""
-            SELECT
-                RANK() OVER (
-                    ORDER BY SUM(s.sale_price) DESC
-                ) as Rank,
-                e2.full_name as Name,
-                ROUND(COALESCE(SUM(s.sale_price), 0), 0) as Revenue
-            FROM main_silver.stg_employees e2
-            LEFT JOIN main_silver.stg_sales_transactions s
-                ON e2.employee_id = s.employee_id
-                AND s.sale_date_only >= '{f['start_date']}'
-                AND s.sale_date_only <= '{f['end_date']}'
-            WHERE e2.is_salesperson = TRUE
-            GROUP BY e2.employee_id, e2.full_name
-            ORDER BY Revenue DESC
-            LIMIT 10
-        """)
-        st.dataframe(rank, use_container_width=True, hide_index=True)
-
-    with col2:
-        section_title("My Sales This Period")
-        my_sales = query(f"""
-            SELECT transaction_id as ID,
-                   sale_date_only as Date,
-                   ROUND(sale_price, 0) as Amount,
-                   financing_approved as Financed
-            FROM main_silver.stg_sales_transactions
-            WHERE employee_id = '{employee_id}'
-            AND sale_date_only >= '{f['start_date']}'
-            AND sale_date_only <= '{f['end_date']}'
-            ORDER BY Date DESC
-        """)
-        if len(my_sales) > 0:
-            st.dataframe(
-                my_sales, use_container_width=True, hide_index=True
-            )
-        else:
-            st.info("No sales in this period.")
-
-    divider()
-    col1, col2, col3 = st.columns([4, 1, 4])
-    with col2:
-        if st.button("Sign Out", use_container_width=True):
-            st.session_state.logged_in = False
-            st.session_state.user = None
-            st.rerun()
-
-# ============================================================
-# ROUTER
-# ============================================================
-
-if not st.session_state.logged_in:
-    show_login()
-else:
-    user = st.session_state.user
-    show_topnav(user)
-    st.markdown(
-        "<div style='padding:0 48px'>",
-        unsafe_allow_html=True
-    )
-    filters = show_filters(user)
-    st.markdown("<div style='height:24px'></div>", unsafe_allow_html=True)
+    last = data_through()
+    cols = st.columns([1.6, 1.1, 1.1, 1.2, 1.4])
+    period = cols[0].radio("Period", ["Last 7 days", "Last 30 days", "Month to date"],
+                           index=1, horizontal=True)
+    start = {"Last 7 days": last - timedelta(days=6), "Last 30 days": last - timedelta(days=29),
+             "Month to date": last.replace(day=1)}[period]
 
     if user["role"] == "Executive":
-        show_executive(filters)
-    elif user["role"] == "Branch Manager":
-        show_branch_manager(user, filters)
-    elif user["role"] == "Salesperson":
-        show_salesperson(user, filters)
+        branch = cols[1].selectbox("Branch", ["All branches"] + list(BRANCHES))
+        location_id = BRANCHES.get(branch)
+    else:
+        location_id = user["location_id"]
+        cols[1].selectbox("Branch", [f"{[c for c, l in BRANCHES.items() if l == location_id][0]}"], disabled=True)
 
-    st.markdown("</div>", unsafe_allow_html=True)
+    makes = q("SELECT DISTINCT make FROM main_silver.stg_vehicles ORDER BY make")["make"].tolist()
+    make = cols[2].selectbox("Make", ["All makes"] + makes)
+    sale_type = cols[3].radio("Sale type", ["All", "Financed", "Cash"], horizontal=True)
+
+    employee_id = None
+    if user["role"] != "Salesperson":
+        people = salespeople(active_db())
+        if location_id:
+            people = people[people["location_id"] == location_id]
+        who = cols[4].selectbox("Salesperson", ["Everyone"] + people["full_name"].tolist())
+        if who != "Everyone":
+            employee_id = people.loc[people["full_name"] == who, "employee_id"].iloc[0]
+    else:
+        employee_id = user["employee_id"]
+
+    st.markdown(f'<p class="pk-quiet">Showing {start:%b %-d} to {last:%b %-d, %Y}. '
+                f'Periods count back from the latest sale in the data.</p>', unsafe_allow_html=True)
+    return {"start": start, "end": last, "location_id": location_id,
+            "make": None if make == "All makes" else make, "sale_type": sale_type,
+            "employee_id": employee_id}
+
+
+# ------------------------------------------------------------
+# Business view, one per role
+# ------------------------------------------------------------
+
+def show_executive(f):
+    w = where(f)
+    stats = q(f"""
+        SELECT COUNT(*) AS units, COALESCE(SUM(sale_price), 0) AS revenue,
+               COALESCE(AVG(CASE WHEN financing_approved THEN 1.0 ELSE 0 END), 0) AS fin
+        FROM main_silver.stg_sales_transactions s WHERE {w}
+    """).iloc[0]
+    on_track = int(one("SELECT COUNT(*) FROM main_gold.revenue_vs_target WHERE status = 'On Track'"))
+    units, revenue = int(stats.units), stats.revenue
+
+    c = st.columns(5)
+    c[0].metric("Revenue", money(revenue), help=DEFINITIONS["revenue"])
+    c[1].metric("Cars sold", f"{units:,}", help=DEFINITIONS["units"])
+    c[2].metric("Average deal", money(revenue / units if units else 0), help=DEFINITIONS["avg_deal"])
+    c[3].metric("Financed", f"{stats.fin * 100:.0f}%", help=DEFINITIONS["financed"])
+    c[4].metric("Branches on track", f"{on_track} of 5", help=DEFINITIONS["on_track"])
+
+    left, right = st.columns([3, 2])
+    with left:
+        sub("Revenue by branch")
+        by_branch = q(f"""
+            SELECT l.city, COALESCE(SUM(s.sale_price), 0) AS revenue
+            FROM main_silver.stg_locations l
+            LEFT JOIN main_silver.stg_sales_transactions s
+              ON s.location_id = l.location_id AND {w}
+            GROUP BY l.city ORDER BY revenue DESC
+        """)
+        fig = go.Figure(go.Bar(x=by_branch.city, y=by_branch.revenue, marker_color=NAVY,
+                               hovertemplate="%{x}: $%{y:,.0f}<extra></extra>"))
+        chart(fig, 280)
+    with right:
+        sub("This month against target")
+        tgt = q("SELECT city, pct_of_target FROM main_gold.revenue_vs_target ORDER BY pct_of_target")
+        fig = go.Figure(go.Bar(
+            x=tgt.pct_of_target, y=tgt.city, orientation="h",
+            marker_color=[GOOD if v >= 100 else GOLD for v in tgt.pct_of_target],
+            text=[f"{v:.0f}%" for v in tgt.pct_of_target], textposition="outside",
+            hovertemplate="%{y}: %{x:.1f}% of target<extra></extra>"))
+        fig.add_vline(x=100, line_dash="dot", line_color=INK3)
+        chart(fig, 280)
+
+    sub("Daily revenue")
+    trend = q(f"""SELECT sale_date_only AS day, SUM(sale_price) AS revenue
+                  FROM main_silver.stg_sales_transactions s WHERE {w}
+                  GROUP BY day ORDER BY day""")
+    fig = go.Figure(go.Scatter(x=trend.day, y=trend.revenue, mode="lines", line=dict(color=MOTORS, width=2),
+                               hovertemplate="%{x|%b %-d}: $%{y:,.0f}<extra></extra>"))
+    chart(fig, 220)
+
+    sub("Top salespeople")
+    st.dataframe(q(f"""
+        SELECT e.full_name AS "Salesperson", l.city AS "Branch",
+               COUNT(*) AS "Cars sold", ROUND(SUM(s.sale_price)) AS "Revenue ($)",
+               ROUND(SUM(s.sale_price) * e.commission_rate) AS "Commission ($)"
+        FROM main_silver.stg_sales_transactions s
+        JOIN main_silver.stg_employees e ON e.employee_id = s.employee_id
+        JOIN main_silver.stg_locations l ON l.location_id = s.location_id
+        WHERE {w}
+        GROUP BY e.full_name, l.city, e.commission_rate
+        ORDER BY "Revenue ($)" DESC LIMIT 10
+    """), use_container_width=True, hide_index=True)
+
+
+def show_manager(user, f):
+    w = where(f)
+    stats = q(f"""SELECT COUNT(*) AS units, COALESCE(SUM(sale_price), 0) AS revenue
+                  FROM main_silver.stg_sales_transactions s WHERE {w}""").iloc[0]
+    tgt = q(f"""SELECT monthly_target, pct_of_target, status FROM main_gold.revenue_vs_target
+                WHERE location_id = '{user['location_id']}'""")
+
+    c = st.columns(4)
+    c[0].metric("Revenue", money(stats.revenue), help=DEFINITIONS["revenue"])
+    c[1].metric("Cars sold", f"{int(stats.units):,}", help=DEFINITIONS["units"])
+    if len(tgt):
+        t = tgt.iloc[0]
+        c[2].metric("Monthly target", money(t.monthly_target), f"{t.pct_of_target:.0f}% so far this month",
+                    delta_color="off", help=DEFINITIONS["target"])
+        c[3].metric("This month", "On track" if t.status == "On Track" else "Behind pace", help=DEFINITIONS["on_track"])
+
+    left, right = st.columns([3, 2])
+    with left:
+        sub("Daily revenue")
+        trend = q(f"""SELECT sale_date_only AS day, SUM(sale_price) AS revenue
+                      FROM main_silver.stg_sales_transactions s WHERE {w}
+                      GROUP BY day ORDER BY day""")
+        chart(go.Figure(go.Bar(x=trend.day, y=trend.revenue, marker_color=NAVY,
+                               hovertemplate="%{x|%b %-d}: $%{y:,.0f}<extra></extra>")), 260)
+    with right:
+        sub("Team")
+        st.dataframe(q(f"""
+            SELECT e.full_name AS "Salesperson", COUNT(s.transaction_id) AS "Cars sold",
+                   ROUND(COALESCE(SUM(s.sale_price), 0)) AS "Revenue ($)"
+            FROM main_silver.stg_employees e
+            LEFT JOIN main_silver.stg_sales_transactions s ON s.employee_id = e.employee_id AND {w}
+            WHERE e.location_id = '{user['location_id']}' AND e.is_salesperson
+            GROUP BY e.full_name ORDER BY "Revenue ($)" DESC
+        """), use_container_width=True, hide_index=True)
+
+    left, right = st.columns(2)
+    with left:
+        sub("Cars on the lot")
+        make_filter = f"AND make = '{f['make']}'" if f.get("make") else ""
+        st.dataframe(q(f"""
+            SELECT make AS "Make", status AS "Status", COUNT(*) AS "Cars", ROUND(AVG(list_price)) AS "Avg list price ($)"
+            FROM main_silver.stg_vehicles WHERE location_id = '{user['location_id']}' {make_filter}
+            GROUP BY make, status ORDER BY make, status
+        """), use_container_width=True, hide_index=True)
+    with right:
+        sub("Service bay")
+        st.dataframe(q(f"""
+            SELECT e.full_name AS "Technician", COUNT(j.job_id) AS "Jobs",
+                   ROUND(COALESCE(SUM(j.labor_revenue), 0)) AS "Labor revenue ($)",
+                   ROUND(AVG(j.efficiency_ratio), 2) AS "Efficiency"
+            FROM main_silver.stg_employees e
+            LEFT JOIN main_silver.stg_service_jobs j
+              ON j.technician_id = e.employee_id AND j.job_date_only BETWEEN '{f['start']}' AND '{f['end']}'
+            WHERE e.location_id = '{user['location_id']}' AND NOT e.is_salesperson
+            GROUP BY e.full_name ORDER BY "Labor revenue ($)" DESC
+        """), use_container_width=True, hide_index=True)
+
+
+def show_salesperson(user, f):
+    w = where(f)
+    s = q(f"""SELECT COUNT(*) AS deals, COALESCE(SUM(sale_price), 0) AS revenue,
+                     COALESCE(MAX(sale_price), 0) AS best
+              FROM main_silver.stg_sales_transactions s WHERE {w}""").iloc[0]
+    rate = one(f"SELECT commission_rate FROM main_silver.stg_employees WHERE employee_id = '{user['employee_id']}'")
+
+    c = st.columns(4)
+    c[0].metric("Cars sold", int(s.deals), help=DEFINITIONS["units"])
+    c[1].metric("Revenue", money(s.revenue), help=DEFINITIONS["revenue"])
+    c[2].metric("Commission", money(s.revenue * rate), f"{rate * 100:.1f}% rate", delta_color="off",
+                help=DEFINITIONS["commission"])
+    c[3].metric("Best sale", money(s.best), help=DEFINITIONS["best"])
+
+    others = dict(f, employee_id=None, location_id=None)
+    left, right = st.columns([2, 3])
+    with left:
+        sub("Where you rank")
+        st.dataframe(q(f"""
+            SELECT RANK() OVER (ORDER BY SUM(s.sale_price) DESC) AS "Rank", e.full_name AS "Salesperson",
+                   ROUND(SUM(s.sale_price)) AS "Revenue ($)"
+            FROM main_silver.stg_sales_transactions s
+            JOIN main_silver.stg_employees e ON e.employee_id = s.employee_id
+            WHERE {where(others)}
+            GROUP BY e.full_name ORDER BY "Rank" LIMIT 10
+        """), use_container_width=True, hide_index=True)
+    with right:
+        sub("Your sales")
+        mine = q(f"""SELECT transaction_id AS "Sale", sale_date_only AS "Date",
+                            ROUND(sale_price) AS "Price ($)", financing_approved AS "Financed"
+                     FROM main_silver.stg_sales_transactions s WHERE {w} ORDER BY "Date" DESC""")
+        if len(mine):
+            st.dataframe(mine, use_container_width=True, hide_index=True)
+        else:
+            st.info("No sales in this period. Try a longer period or clear the filters.")
+
+
+def business_view(user):
+    run = st.session_state.get("run")
+    if run:
+        st.markdown(f'<div class="pk-callout">You\'re looking at the data from your own pipeline run '
+                    f'(seed {run.seed}). It disappears when you sign out.</div>', unsafe_allow_html=True)
+    f = show_filters(user)
+    if user["role"] == "Executive":
+        show_executive(f)
+    elif user["role"] == "Branch Manager":
+        show_manager(user, f)
+    else:
+        show_salesperson(user, f)
+
+
+# ------------------------------------------------------------
+# How it runs
+# ------------------------------------------------------------
+
+STEP_CODE = {
+    "Generate source data": f"{REPO}/data_generator/generate_data.py",
+    "Plant problems": f"{REPO}/dashboard/pipeline.py",
+    "Load raw layer": f"{REPO}/ingestion/ingest_bronze.py",
+    "Clean and model with dbt": f"{REPO}/dbt_project/pkomm_motors/models/staging",
+    "Run data tests": f"{REPO}/dbt_project/pkomm_motors/models/staging/schema.yml",
+    "Build business tables": f"{REPO}/dbt_project/pkomm_motors/models/marts",
+}
+PLAN = ["Generate source data", "Load raw layer", "Clean and model with dbt",
+        "Run data tests", "Build business tables"]
+
+
+def steps_html(done, planned):
+    rows = []
+    names = [s.name for s in done]
+    todo = [p for p in planned if p not in names]
+    for i, s in enumerate(done, start=1):
+        cls, state = ("done", "Done") if s.ok else ("fail", "Failed")
+        link = STEP_CODE.get(s.name)
+        code = f' &middot; <a href="{link}" target="_blank">code</a>' if link else ""
+        rows.append(f'<div class="pk-step {cls}"><div class="n">{i}</div>'
+                    f'<div class="what"><b>{s.name}</b><span>{html.escape(s.detail)}{code}</span></div>'
+                    f'<div class="t">{s.seconds:.1f}s</div><div class="s">{state}</div></div>')
+    for j, name in enumerate(todo, start=len(done) + 1):
+        rows.append(f'<div class="pk-step wait"><div class="n">{j}</div>'
+                    f'<div class="what"><b>{name}</b><span>Waiting</span></div>'
+                    f'<div class="t"></div><div class="s"></div></div>')
+    return f'<div class="pk-steps">{"".join(rows)}</div>'
+
+
+def health_html(run):
+    planted_col = run.broke_it
+    rows = []
+    for h in run.health:
+        tone = {"None found": "pk-quiet", "Removed by the cleaning step": "pk-warn",
+                "Got through cleaning, caught by a test": "pk-ok",
+                "Got through unnoticed": "pk-bad"}[h["outcome"]]
+        planted = f'<td class="num">{run.planted.get(h["key"], 0)}</td>' if planted_col else ""
+        rows.append(f'<tr><td>{h["label"]}</td>{planted}<td class="num">{h["found"]}</td>'
+                    f'<td class="num">{h["left"]}</td><td class="{tone}">{h["outcome"]}</td></tr>')
+    th = "<th>Planted</th>" if planted_col else ""
+    return (f'<table class="pk-table"><tr><th>Problem</th>{th}<th>Found in raw</th>'
+            f'<th>Left after cleaning</th><th>What happened</th></tr>{"".join(rows)}</table>')
+
+
+def how_it_runs():
+    head("How it runs",
+         "Press run and the whole Pkomm Motors pipeline builds from scratch on this server: fresh source "
+         "data, a raw layer, dbt cleaning and models, 23 data tests, and the business tables behind the "
+         "dashboard. Break it does the same, but first slips bad records into the raw files.")
+
+    a, b, c = st.columns([1.1, 1.1, 2.8])
+    go_run = a.button("Run the pipeline", type="primary", use_container_width=True)
+    go_break = b.button("Break it, then run", use_container_width=True)
+    with c.expander("Replay a run"):
+        replay = st.number_input("Seed", min_value=1, max_value=99999, value=None, step=1,
+                                 help="The same seed always produces the same data. Leave empty for a new one.")
+
+    box = st.empty()
+
+    if go_run or go_break:
+        planned = PLAN[:1] + (["Plant problems"] if go_break else []) + PLAN[1:]
+        live = []
+        box.markdown(steps_html(live, planned), unsafe_allow_html=True)
+
+        def on_step(step):
+            live.append(step)
+            box.markdown(steps_html(live, planned), unsafe_allow_html=True)
+
+        previous = st.session_state.get("run")
+        try:
+            result = pipeline.run(seed=int(replay) if replay else None, break_it=go_break, on_step=on_step)
+        except pipeline.PipelineBusy:
+            st.info("Someone else is running the pipeline right now. Give it a few seconds and try again.")
+            return
+        pipeline.cleanup(previous)
+        st.session_state.run = result
+        st.rerun()  # so the Business view picks up the new data straight away
+
+    run = st.session_state.get("run")
+    if not run:
+        box.markdown(steps_html([], PLAN), unsafe_allow_html=True)
+        st.markdown('<p class="pk-quiet">Nothing has run yet in your session. Each run takes about '
+                    '10 seconds, uses its own temporary database, and is deleted when you sign out.</p>',
+                    unsafe_allow_html=True)
+        return
+
+    box.markdown(steps_html(run.steps, [s.name for s in run.steps]), unsafe_allow_html=True)
+
+    failed = run.tests_failed
+    total = sum(s.seconds for s in run.steps)
+    if failed:
+        st.markdown(f'<div class="pk-callout bad">{len(failed)} of {len(run.tests)} tests failed, '
+                    f'which is the point: the tests caught bad data before it reached the business tables. '
+                    f'Built in {total:.1f}s from seed {run.seed}.</div>', unsafe_allow_html=True)
+    else:
+        st.markdown(f'<div class="pk-callout">All {len(run.tests)} tests passed. Built in {total:.1f}s from '
+                    f'seed {run.seed}. The Business view now shows this run\'s data.</div>',
+                    unsafe_allow_html=True)
+
+    sub("Data health")
+    st.markdown(health_html(run), unsafe_allow_html=True)
+    if any(h["outcome"] == "Removed by the cleaning step" and h["found"] for h in run.health):
+        st.markdown('<p class="pk-quiet" style="margin-top:10px">Honest note: the cleaning step drops bad '
+                    'rows without keeping them anywhere. A real team would set them aside in a quarantine '
+                    'table with the reason. That fix is on the list.</p>', unsafe_allow_html=True)
+
+    sub("Tests")
+    tests = sorted(run.tests, key=lambda t: (t["status"] == "pass", t["name"]))
+    rows = "".join(
+        f'<tr><td>{t["name"]}</td><td class="{"pk-ok" if t["status"] == "pass" else "pk-bad"}">'
+        f'{"Passed" if t["status"] == "pass" else "Failed"}</td>'
+        f'<td class="num">{t["failures"] or ""}</td></tr>' for t in tests)
+    with st.expander(f"All {len(tests)} tests", expanded=bool(failed)):
+        st.markdown(f'<table class="pk-table"><tr><th>Test</th><th>Result</th><th>Bad rows</th></tr>{rows}</table>',
+                    unsafe_allow_html=True)
+
+
+# ------------------------------------------------------------
+# Problems solved
+# ------------------------------------------------------------
+
+PROBLEMS = [
+    ("001", "Yesterday's sales changed overnight",
+     "The old generator rebuilt the last 90 days every morning, so closed days kept changing.",
+     "Open", "problems/001-history-rewrites-itself"),
+    ("002", "The repo that grows every day",
+     "A daily job saved the whole database into git, 208 commits and counting.",
+     "Open", "problems/002-database-in-git"),
+]
+
+
+def problems():
+    head("Problems solved", "Each problem in this business is logged like a work ticket, fixed, tested and "
+         "written up. The tickets, code and tests live on GitHub.")
+    rows = "".join(
+        f'<div class="pk-problem"><div class="n">{n}</div><div><h4>{t}</h4><p>{d} '
+        f'<a href="{REPO_TREE}/{path}" target="_blank">Read the ticket</a></p></div>'
+        f'<div class="st">{s}</div></div>' for n, t, d, s, path in PROBLEMS)
+    st.markdown(rows, unsafe_allow_html=True)
+    st.markdown(f'<p class="pk-quiet" style="margin-top:16px">Write-ups go up on '
+                f'<a href="https://pkomm.com/blog" target="_blank">pkomm.com/blog</a> as each one is finished.</p>',
+                unsafe_allow_html=True)
+
+
+# ------------------------------------------------------------
+# Page
+# ------------------------------------------------------------
+
+user = st.session_state.get("user")
+if not user:
+    show_login()
+else:
+    show_bar(user)
+    tab_business, tab_runs, tab_problems = st.tabs(["Business view", "How it runs", "Problems solved"])
+    with tab_business:
+        business_view(user)
+    with tab_runs:
+        how_it_runs()
+    with tab_problems:
+        problems()
