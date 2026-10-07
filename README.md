@@ -1,22 +1,22 @@
 <picture>
-  <source media="(prefers-color-scheme: dark)" srcset="brand/kommineni-group/lockup-dark.svg">
-  <img src="brand/kommineni-group/lockup-light.svg" alt="Kommineni Group" height="72">
+  <source media="(prefers-color-scheme: dark)" srcset="brand/pkomm-group/lockup-dark.svg">
+  <img src="brand/pkomm-group/lockup-light.svg" alt="Pkomm Group" height="72">
 </picture>
 
-# Kommineni Group
+# Pkomm Group
 
-A made-up company I use to practise real data engineering problems, solve them, and write them up.
+**Pkomm Group is a fictional company.** I made it up to practise real data engineering problems, solve them, and write them up.
 
 Practice projects usually start with clean data. Real jobs don't. So this company makes messy data on purpose: records that arrive late, history that changes, files that break. Each problem gets logged like a work ticket, fixed with free tools, tested, and written up on [pkomm.com/blog](https://pkomm.com/blog).
 
-The businesses and their numbers are simulated. The code, tests and fixes are real. Built by [Prameel Kommineni](https://pkomm.com).
+The businesses, customers and numbers are fictional and simulated. The code, tests and fixes are real. Built by [Prameel Kommineni](https://pkomm.com).
 
 ## The businesses
 
 | Business | What it does | Code |
 |---|---|---|
-| Meel Motors | Five car dealerships with service bays. Raw data in DuckDB, cleaned and modelled with dbt, 23 tests, a [live dashboard](https://kommineni-automotive.streamlit.app) with three role-based views | [divisions/meel-motors](divisions/meel-motors) |
-| Meel Cart | An online store whose orders, payments and shipments change for days after they're placed. A daily incremental pipeline that keeps the newest version of every record, with backfills | [divisions/meel-cart](divisions/meel-cart) |
+| Pkomm Motors | Five car dealerships with service bays. Raw data in DuckDB, cleaned and modelled with dbt, 23 tests, a [live dashboard](https://pkomm-motors.streamlit.app) with three role-based views | [divisions/pkomm-motors](divisions/pkomm-motors) |
+| Pkomm Cart | An online store whose orders, payments and shipments change for days after they're placed. A daily incremental pipeline that keeps the newest version of every record, with backfills | [divisions/pkomm-cart](divisions/pkomm-cart) |
 
 More businesses open one at a time, each when there's a real problem to solve in it.
 
@@ -24,9 +24,9 @@ More businesses open one at a time, each when there's a real problem to solve in
 
 | # | Problem | Business | Status |
 |---|---|---|---|
-| 001 | [Yesterday's sales changed overnight](problems/001-history-rewrites-itself) | Meel Motors | Open |
-| 002 | [The repo that grows every day](problems/002-database-in-git) | Meel Motors | Open |
-| 003 | [Late payments flip the revenue number](problems/003-late-arriving-updates) | Meel Cart | Fixed, needs tests and write-up |
+| 001 | [Yesterday's sales changed overnight](problems/001-history-rewrites-itself) | Pkomm Motors | Open |
+| 002 | [The repo that grows every day](problems/002-database-in-git) | Pkomm Motors | Open |
+| 003 | [Late payments flip the revenue number](problems/003-late-arriving-updates) | Pkomm Cart | Fixed, needs tests and write-up |
 
 Every write-up follows the same [template](problems/_template.md): the problem, the fix, why this way, what went wrong, proof, honest limits, and how it would run on AWS, Azure or Snowflake.
 
@@ -38,7 +38,7 @@ Each one stands in for a cloud service a real team would use. The [tool map](doc
 
 ## History
 
-Meel Motors started as `kommineni-automotive-pipeline` and Meel Cart as `ecommerce-incremental-analytics`. Both were merged here with their full commit history.
+Pkomm Motors started as `kommineni-automotive-pipeline` and Pkomm Cart as `ecommerce-incremental-analytics`. Both were merged here with their full commit history.
 
 ## License
 
