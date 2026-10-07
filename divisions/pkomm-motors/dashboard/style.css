@@ -150,3 +150,4 @@ a { color: var(--navy); text-decoration-color: var(--gold); text-underline-offse
 [data-testid="stHeaderActionElements"], h1 a, h2 a, h3 a { display: none !important; }
 .stMarkdown a, .stMarkdown a:visited { color: var(--navy) !important; text-decoration-color: var(--gold) !important; }
 .pk-login { margin-bottom: 22px; }
+.pk-fresh.held i { background: var(--bad); }

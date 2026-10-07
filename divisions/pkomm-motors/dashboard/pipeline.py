@@ -31,6 +31,10 @@ sys.path.insert(0, os.path.join(DIVISION, "ingestion"))
 import generate_data  # noqa: E402
 import ingest_bronze  # noqa: E402
 
+# Business tables live in models/marts. If a test on anything upstream fails,
+# dbt build skips these, so bad data never reaches what the business reads.
+GOLD = {f[:-4] for f in os.listdir(os.path.join(DBT_DIR, "models", "marts")) if f.endswith(".sql")}
+
 TABLES = {
     "locations": "locations.csv",
     "employees": "employees.csv",
@@ -66,10 +70,15 @@ class RunResult:
     tests: list = field(default_factory=list)
     health: list = field(default_factory=list)
     finished_at: float = 0.0
+    published: bool = False
 
     @property
     def tests_failed(self):
-        return [t for t in self.tests if t["status"] != "pass"]
+        return [t for t in self.tests if t["status"] in ("fail", "error")]
+
+    @property
+    def tests_skipped(self):
+        return [t for t in self.tests if t["status"] == "skipped"]
 
 
 # ------------------------------------------------------------
@@ -151,7 +160,7 @@ def check_health(db_path, tests):
         elif left == 0:
             outcome = "Removed by the cleaning step"
         elif c["test"] and c["test"] in failed_tests:
-            outcome = "Got through cleaning, caught by a test"
+            outcome = "Got through cleaning, stopped by a test"
         else:
             outcome = "Got through unnoticed"
         rows.append({"key": c["key"], "label": c["label"], "found": int(found),
@@ -198,6 +207,7 @@ def _dbt(command, workdir, db_path):
         with open(path) as f:
             for r in json.load(f)["results"]:
                 results.append({
+                    "type": r["unique_id"].split(".")[0],
                     "name": r["unique_id"].split(".")[2],
                     "status": r["status"],
                     "seconds": round(r.get("execution_time") or 0, 2),
@@ -267,29 +277,45 @@ def run(seed=None, break_it=False, on_step=None):
         record(Step("Load raw layer", f"{loaded:,} rows kept exactly as they arrived",
                     time.time() - t0))
 
-        # 3. Clean and build with dbt
+        # 3. One dbt build: each model, then its tests, then whatever depends on it.
+        # A failing test stops everything downstream, which is the quality gate.
         t0 = time.time()
-        ok, models = _dbt("run", workdir, db_path)
-        built = sum(1 for m in models if m["status"] == "success")
-        record(Step("Clean and model with dbt", f"{built} of {len(models)} models built",
-                    time.time() - t0, ok))
-
-        # 4. Test
-        t0 = time.time()
-        _, tests = _dbt("test", workdir, db_path)
+        _, results = _dbt("build", workdir, db_path)
+        wall = time.time() - t0
+        models = [r for r in results if r["type"] == "model" and r["name"] not in GOLD]
+        gold = [r for r in results if r["type"] == "model" and r["name"] in GOLD]
+        tests = [r for r in results if r["type"] == "test"]
         result.tests = tests
-        passed = sum(1 for t in tests if t["status"] == "pass")
-        record(Step("Run data tests", f"{passed} of {len(tests)} tests passed",
-                    time.time() - t0, passed == len(tests)))
 
-        # 5. What the business sees
+        t_tests = sum(t["seconds"] for t in tests)
+        t_gold = sum(g["seconds"] for g in gold)
+        built = sum(1 for m in models if m["status"] == "success")
+        # dbt's own start-up time goes on this step, so the steps add up to the wall clock.
+        record(Step("Clean and model with dbt", f"{built} of {len(models)} cleaned tables built",
+                    max(wall - t_tests - t_gold, 0), built == len(models)))
+
+        passed = sum(1 for t in tests if t["status"] == "pass")
+        failed = len(result.tests_failed)
+        skipped = len(result.tests_skipped)
+        if failed:
+            detail = f"{failed} failed, {passed} passed"
+            if skipped:
+                detail += f", {skipped} skipped with their held-back tables"
+        else:
+            detail = f"{passed} of {len(tests)} tests passed"
+        record(Step("Run data tests", detail, t_tests, failed == 0))
+
+        # 4. What the business sees
         t0 = time.time()
-        silver = table_counts(db_path, "main_silver")
-        gold = table_counts(db_path, "main_gold")
         result.health = check_health(db_path, tests)
-        record(Step("Build business tables",
-                    f"{len(gold)} tables ready, {sum(silver.values()):,} clean rows underneath",
-                    time.time() - t0))
+        ready = sum(1 for g in gold if g["status"] == "success")
+        result.published = ready == len(GOLD) and failed == 0
+        if result.published:
+            silver = table_counts(db_path, "main_silver")
+            detail = f"{ready} tables ready, {sum(silver.values()):,} clean rows underneath"
+        else:
+            detail = f"Held back: {len(GOLD) - ready} of {len(GOLD)} not rebuilt because tests failed upstream"
+        record(Step("Build business tables", detail, t_gold + time.time() - t0, result.published))
     finally:
         _run_lock.release()
 

@@ -76,8 +76,9 @@ DEFINITIONS = {
 # ------------------------------------------------------------
 
 def active_db():
+    # A run whose tests failed is held back, so the views keep the last good data.
     run = st.session_state.get("run")
-    return run.db_path if run else SAMPLE_DB
+    return run.db_path if run and run.published else SAMPLE_DB
 
 
 @st.cache_resource
@@ -235,7 +236,9 @@ def show_login():
 
 def show_bar(user):
     run = st.session_state.get("run")
-    if run:
+    if run and not run.published:
+        fresh = '<span class="pk-fresh held"><i></i>Your run was held back, showing sample data</span>'
+    elif run:
         mins = int((time.time() - run.finished_at) // 60)
         ago = "just now" if mins < 1 else f"{mins} min ago"
         fresh = f'<span class="pk-fresh run"><i></i>Your run, built {ago}</span>'
@@ -463,9 +466,13 @@ def show_salesperson(user, f):
 
 def business_view(user):
     run = st.session_state.get("run")
-    if run:
+    if run and run.published:
         st.markdown(f'<div class="pk-callout">You\'re looking at the data from your own pipeline run '
                     f'(seed {run.seed}). It disappears when you sign out.</div>', unsafe_allow_html=True)
+    elif run:
+        st.markdown('<div class="pk-callout bad">Your last run failed its tests, so its business tables '
+                    'were held back. This view still shows the last good data, the way a real dashboard '
+                    'should.</div>', unsafe_allow_html=True)
     f = show_filters(user)
     if user["role"] == "Executive":
         show_executive(f)
@@ -514,7 +521,7 @@ def health_html(run):
     rows = []
     for h in run.health:
         tone = {"None found": "pk-quiet", "Removed by the cleaning step": "pk-warn",
-                "Got through cleaning, caught by a test": "pk-ok",
+                "Got through cleaning, stopped by a test": "pk-ok",
                 "Got through unnoticed": "pk-bad"}[h["outcome"]]
         planted = f'<td class="num">{run.planted.get(h["key"], 0)}</td>' if planted_col else ""
         rows.append(f'<tr><td>{h["label"]}</td>{planted}<td class="num">{h["found"]}</td>'
@@ -571,9 +578,11 @@ def how_it_runs():
     failed = run.tests_failed
     total = sum(s.seconds for s in run.steps)
     if failed:
-        st.markdown(f'<div class="pk-callout bad">{len(failed)} of {len(run.tests)} tests failed, '
-                    f'which is the point: the tests caught bad data before it reached the business tables. '
-                    f'Built in {total:.1f}s from seed {run.seed}.</div>', unsafe_allow_html=True)
+        held = next(s.detail for s in run.steps if s.name == "Build business tables")
+        st.markdown(f'<div class="pk-callout bad">{len(failed)} of {len(run.tests)} tests failed, so the '
+                    f'business tables were held back ({held.split(": ", 1)[-1]}). The dashboard kept the last '
+                    f'good numbers. That is the quality gate doing its job. Built in {total:.1f}s from seed '
+                    f'{run.seed}.</div>', unsafe_allow_html=True)
     else:
         st.markdown(f'<div class="pk-callout">All {len(run.tests)} tests passed. Built in {total:.1f}s from '
                     f'seed {run.seed}. The Business view now shows this run\'s data.</div>',
@@ -587,10 +596,13 @@ def how_it_runs():
                     'table with the reason. That fix is on the list.</p>', unsafe_allow_html=True)
 
     sub("Tests")
-    tests = sorted(run.tests, key=lambda t: (t["status"] == "pass", t["name"]))
+    order = {"fail": 0, "error": 0, "skipped": 1, "pass": 2}
+    label = {"fail": ("Failed", "pk-bad"), "error": ("Error", "pk-bad"),
+             "skipped": ("Skipped, table held back", "pk-warn"), "pass": ("Passed", "pk-ok")}
+    tests = sorted(run.tests, key=lambda t: (order.get(t["status"], 0), t["name"]))
     rows = "".join(
-        f'<tr><td>{t["name"]}</td><td class="{"pk-ok" if t["status"] == "pass" else "pk-bad"}">'
-        f'{"Passed" if t["status"] == "pass" else "Failed"}</td>'
+        f'<tr><td>{t["name"]}</td><td class="{label.get(t["status"], ("?", ""))[1]}">'
+        f'{label.get(t["status"], (t["status"], ""))[0]}</td>'
         f'<td class="num">{t["failures"] or ""}</td></tr>' for t in tests)
     with st.expander(f"All {len(tests)} tests", expanded=bool(failed)):
         st.markdown(f'<table class="pk-table"><tr><th>Test</th><th>Result</th><th>Bad rows</th></tr>{rows}</table>',
