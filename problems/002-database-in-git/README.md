@@ -5,6 +5,9 @@
 **Level:** 1
 **Status:** Open
 
+## Where I've seen this on the job
+On the job, data lands in S3 or ADLS and loads into Snowflake from there. The code repo only ever holds code. This problem moves Meel Motors to the same split.
+
 ## The ticket
 Cloning the Meel Motors repo gets slower every week, and most commits say Auto refresh data.
 

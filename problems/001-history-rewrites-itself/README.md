@@ -5,6 +5,9 @@
 **Level:** 2
 **Status:** Open
 
+## Where I've seen this on the job
+At a national trucking company, I built raw, cleaned and reporting layers so analysts only query validated data, and closed days have to stay closed. This problem is what happens when the raw layer gets rebuilt instead of appended to.
+
 ## The ticket
 The Chicago branch manager: Last Tuesday showed 6 cars sold on Wednesday morning. Today the same Tuesday shows 3. Which number do I report?
 

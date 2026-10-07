@@ -10,6 +10,9 @@ One short paragraph that explains the problem with something from normal life, b
 
 Good analogies are things everyone has lived through: a bank statement, a restaurant bill, a package being tracked, a doctor's office, a filing cabinet.
 
+## Where I've seen this on the job
+One or two sentences on when this same problem showed up in my real work, matching a line on my resume. Name the kind of company, never the employer: "At a national trucking company, I..." No employer code, data or names.
+
 ## The problem
 
 ### The ticket

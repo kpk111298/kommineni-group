@@ -5,6 +5,9 @@
 **Level:** 2
 **Status:** Fixed, needs tests and write-up
 
+## Where I've seen this on the job
+At a Fortune 500 insurer, I loaded on-premises SQL Server data with watermark-based incremental loads, where records kept changing after the first load. At a national trucking company, log-based change data capture brought the same kind of late updates into Snowflake. Meel Cart is a small, public version of that problem.
+
 ## The ticket
 Finance: Monday's revenue looked fine on Monday. By Thursday it was lower. Why does the past keep moving?
 
