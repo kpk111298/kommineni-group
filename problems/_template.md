@@ -5,6 +5,11 @@
 **Level:** 1 to 4
 **Status:** Open / In progress / Solved / Published
 
+## The everyday version
+One short paragraph that explains the problem with something from normal life, before any tech word. A recruiter who has never written SQL should get it. Then one line that maps it back: "That's exactly what happened to Meel Cart's revenue."
+
+Good analogies are things everyone has lived through: a bank statement, a restaurant bill, a package being tracked, a doctor's office, a filing cabinet.
+
 ## The problem
 
 ### The ticket
