@@ -12,8 +12,12 @@ cleaned AS (
 
     SELECT
         vehicle_id,
-        CONCAT(UPPER(SUBSTR(make, 1, 1)), LOWER(SUBSTR(make, 2))) AS make,
-CONCAT(UPPER(SUBSTR(model, 1, 1)), LOWER(SUBSTR(model, 2))) AS model,
+        -- Title case, except short brand names like BMW that are written in capitals
+        CASE
+            WHEN LENGTH(TRIM(make)) <= 3 THEN UPPER(TRIM(make))
+            ELSE CONCAT(UPPER(SUBSTR(TRIM(make), 1, 1)), LOWER(SUBSTR(TRIM(make), 2)))
+        END AS make,
+        CONCAT(UPPER(SUBSTR(model, 1, 1)), LOWER(SUBSTR(model, 2))) AS model,
         CAST(year AS INTEGER) AS year,
         ROUND(list_price, 2) AS list_price,
         LOWER(status) AS status,
