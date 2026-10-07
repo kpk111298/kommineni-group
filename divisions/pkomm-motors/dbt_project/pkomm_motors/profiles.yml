@@ -3,4 +3,4 @@ pkomm_motors:
   outputs:
     dev:
       type: duckdb
-      path: ../../pkomm_motors.duckdb
+      path: "{{ env_var('PKOMM_MOTORS_DB', '../../pkomm_motors.duckdb') }}"

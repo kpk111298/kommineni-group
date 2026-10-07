@@ -24,9 +24,9 @@ def create_bronze_schema(conn):
     print("Bronze schema ready.")
 
 
-def load_table(conn, table_name, csv_file):
+def load_table(conn, table_name, csv_file, raw_path=RAW_DATA_PATH):
     """Load a single CSV file into a bronze table."""
-    file_path = os.path.join(RAW_DATA_PATH, csv_file)
+    file_path = os.path.join(raw_path, csv_file)
 
     if not os.path.exists(file_path):
         print(f"  WARNING: {file_path} not found, skipping.")
