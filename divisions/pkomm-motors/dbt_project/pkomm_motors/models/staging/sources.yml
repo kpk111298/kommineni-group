@@ -3,10 +3,10 @@ version: 2
 sources:
   - name: bronze
     schema: bronze
-    description: "Raw data ingested from Kommineni Automotive source systems"
+    description: "Raw data ingested from Pkomm Motors source systems"
     tables:
       - name: locations
-        description: "5 Kommineni Automotive branch locations"
+        description: "5 Pkomm Motors branch locations"
       - name: employees
         description: "All salespeople and service technicians across all branches"
       - name: vehicles

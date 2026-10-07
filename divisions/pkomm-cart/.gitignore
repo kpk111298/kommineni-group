@@ -214,7 +214,7 @@ warehouse/*.duckdb
 # macOS junk
 .DS_Store
 
-# Local Meel Cart dashboard launcher (keep local only)
-MeelCart_Dashboard
+# Local Pkomm Cart dashboard launcher (keep local only)
+PkommCart_Dashboard
 run_dashboard.command
 

@@ -1,6 +1,6 @@
-kommineni_automotive:
+pkomm_motors:
   target: dev
   outputs:
     dev:
       type: duckdb
-      path: ../../kommineni_automotive.duckdb
+      path: ../../pkomm_motors.duckdb

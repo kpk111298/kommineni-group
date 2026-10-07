@@ -9,7 +9,7 @@ import pandas as pd
 import os
 from datetime import datetime
 
-DB_PATH = "kommineni_automotive.duckdb"
+DB_PATH = "pkomm_motors.duckdb"
 RAW_DATA_PATH = "data/raw"
 
 
@@ -71,7 +71,7 @@ def verify_bronze(conn):
     print("-" * 40)
     
 def main():
-    print("Kommineni Automotive - Bronze Ingestion Starting...")
+    print("Pkomm Motors - Bronze Ingestion Starting...")
     print(f"Database: {DB_PATH}")
     print(f"Source:   {RAW_DATA_PATH}")
     print("")

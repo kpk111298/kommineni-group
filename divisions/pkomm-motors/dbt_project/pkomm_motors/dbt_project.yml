@@ -1,8 +1,8 @@
-name: 'kommineni_automotive'
+name: 'pkomm_motors'
 version: '1.0.0'
 config-version: 2
 
-profile: 'kommineni_automotive'
+profile: 'pkomm_motors'
 
 model-paths: ["models"]
 analysis-paths: ["analyses"]
@@ -17,7 +17,7 @@ clean-targets:
   - "dbt_packages"
 
 models:
-  kommineni_automotive:
+  pkomm_motors:
     staging:
       +schema: silver
       +materialized: table

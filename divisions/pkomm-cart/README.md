@@ -1,11 +1,11 @@
 <picture>
-  <source media="(prefers-color-scheme: dark)" srcset="../../brand/meel-cart/lockup-dark.svg">
-  <img src="../../brand/meel-cart/lockup-light.svg" alt="Meel Cart" height="72">
+  <source media="(prefers-color-scheme: dark)" srcset="../../brand/pkomm-cart/lockup-dark.svg">
+  <img src="../../brand/pkomm-cart/lockup-light.svg" alt="Pkomm Cart" height="72">
 </picture>
 
-# Meel Cart – E-commerce Incremental Analytics
+# Pkomm Cart – E-commerce Incremental Analytics
 
-This project simulates a real-world **e-commerce analytics platform** built for a fictional company called **Meel Cart**.
+This project simulates a real-world **e-commerce analytics platform** built for a fictional company called **Pkomm Cart**.
 
 The goal is to demonstrate how daily transactional data is processed **incrementally**, while handling late updates and changing business states, and then surfaced through a KPI dashboard.
 

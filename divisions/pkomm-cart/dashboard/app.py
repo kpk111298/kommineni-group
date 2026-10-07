@@ -6,7 +6,7 @@ import streamlit as st
 
 
 DB_PATH = "warehouse/ecomm.duckdb"
-COMPANY_NAME = "Meel Cart"
+COMPANY_NAME = "Pkomm Cart"
 
 
 @st.cache_data(ttl=30)
@@ -88,6 +88,7 @@ def fmt_pct(x: float) -> str:
 
 st.set_page_config(page_title=f"{COMPANY_NAME} | Incremental Analytics", layout="wide")
 st.title(f"{COMPANY_NAME} Analytics")
+st.caption(f"{COMPANY_NAME} is a fictional company. All data is simulated.")
 
 ops = load_ops_metadata()
 

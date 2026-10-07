@@ -1,5 +1,5 @@
 # ============================================================
-# Kommineni Automotive - Clean Light Dashboard
+# Pkomm Motors - Clean Light Dashboard
 # White + Dark text + Gold | Top filters | No sidebar
 # ============================================================
 
@@ -11,7 +11,7 @@ from datetime import datetime, date, timedelta
 import os
 
 st.set_page_config(
-    page_title="Kommineni Automotive",
+    page_title="Pkomm Motors",
     page_icon=None,
     layout="wide",
     initial_sidebar_state="collapsed"
@@ -218,7 +218,7 @@ header { visibility: hidden; }
 
 DB_PATH = os.path.join(
     os.path.dirname(__file__),
-    "../kommineni_automotive.duckdb"
+    "../pkomm_motors.duckdb"
 )
 
 @st.cache_resource
@@ -402,13 +402,16 @@ def show_login():
         <div style="text-align:center;margin-bottom:32px">
             <p style="font-size:22px;font-weight:700;color:#1A1A1A;
                       letter-spacing:-0.5px;margin:0">
-                Kommineni Automotive
+                Pkomm Motors
             </p>
             <div style="width:32px;height:2px;background:#B8860B;
                         margin:10px auto"></div>
             <p style="font-size:10px;color:#999;letter-spacing:2.5px;
                       text-transform:uppercase;margin:0;font-weight:600">
                 Performance Intelligence
+            </p>
+            <p style="font-size:11px;color:#888;margin:14px 0 0">
+                A fictional company. All data is simulated.
             </p>
         </div>
         """, unsafe_allow_html=True)
@@ -480,7 +483,10 @@ def show_topnav(user):
                         border-radius:50%"></div>
             <span style="font-size:14px;font-weight:700;
                          color:#1A1A1A;letter-spacing:-0.3px">
-                Kommineni Automotive
+                Pkomm Motors
+            </span>
+            <span style="font-size:11px;color:#999">
+                fictional company, simulated data
             </span>
         </div>
         <div style="display:flex;align-items:center;gap:20px">

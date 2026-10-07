@@ -15,7 +15,7 @@ random.seed(None)  # different data each run
 
 # ============================================================
 # SECTION 1: LOCATIONS
-# Kommineni Automotive has 5 branches across the US
+# Pkomm Motors has 5 branches across the US
 # ============================================================
 
 def generate_locations():
@@ -275,7 +275,7 @@ def generate_service_jobs(employees_df, vehicles_df, days_back=30):
 # ============================================================
 
 def main():
-    print("Kommineni Automotive - Generating data...")
+    print("Pkomm Motors - Generating data...")
 
     # Create output folder if it does not exist
     output_path = "data/raw"

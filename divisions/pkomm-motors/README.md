@@ -1,9 +1,9 @@
 <picture>
-  <source media="(prefers-color-scheme: dark)" srcset="../../brand/meel-motors/lockup-dark.svg">
-  <img src="../../brand/meel-motors/lockup-light.svg" alt="Meel Motors" height="72">
+  <source media="(prefers-color-scheme: dark)" srcset="../../brand/pkomm-motors/lockup-dark.svg">
+  <img src="../../brand/pkomm-motors/lockup-light.svg" alt="Pkomm Motors" height="72">
 </picture>
 
-# Kommineni Automotive — Data Pipeline & Analytics Platform
+# Pkomm Motors — Data Pipeline & Analytics Platform
 
 A production grade data engineering portfolio project simulating a 5 location automotive dealership. Built to demonstrate real world skills in data ingestion, transformation, warehousing, and analytics.
 
@@ -13,7 +13,7 @@ A production grade data engineering portfolio project simulating a 5 location au
 
 Raw transactional data flows through a full medallion architecture bronze ingestion, silver cleaning, gold aggregation and surfaces in a live executive dashboard with role based access control.
 
-**Live Demo** → [View Dashboard](https://kommineni-automotive.streamlit.app)
+**Live Demo** → [View Dashboard](https://pkomm-motors.streamlit.app)
 
 Login credentials:
 - Executive: `exec001` / `exec001`
@@ -93,8 +93,8 @@ Role based access: Executive, Branch Manager, Salesperson
 
 ## Running Locally
 ```bash
-git clone https://github.com/kpk111298/kommineni-automotive-pipeline
-cd kommineni-automotive-pipeline
+git clone https://github.com/kpk111298/pkomm-group
+cd pkomm-group/divisions/pkomm-motors
 python -m venv venv && source venv/bin/activate
 pip install -r requirements.txt
 
@@ -105,7 +105,7 @@ python data_generator/generate_data.py
 python ingestion/ingest_bronze.py
 
 # Run dbt transformations
-cd dbt_project/kommineni_automotive
+cd dbt_project/pkomm_motors
 dbt run
 dbt test
 
