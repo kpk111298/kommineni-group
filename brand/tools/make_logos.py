@@ -1,4 +1,4 @@
-"""Draws the Kommineni Group logos: a fine double-ring seal plus a serif wordmark."""
+"""Draws the Pkomm Group logos: a fine double-ring seal plus a serif wordmark."""
 import os
 from fontTools.ttLib import TTFont
 from fontTools.pens.svgPathPen import SVGPathPen
@@ -14,26 +14,28 @@ NAVY, IVORY = "#0A0D16", "#F4F1EA"
 GOLD, GOLD_TEXT = "#C9AE72", "#8A7344"
 
 ENTITIES = {
-    "kommineni-group": ("KOMMINENI GROUP", "ILLINOIS · EST. 2026", GOLD),
-    "meel-motors": ("MEEL MOTORS", "A KOMMINENI GROUP COMPANY", "#7A2E2A"),
-    "meel-cart": ("MEEL CART", "A KOMMINENI GROUP COMPANY", "#8C5A1E"),
-    "meel-care": ("MEEL CARE", "A KOMMINENI GROUP COMPANY", "#2F5D46"),
-    "meel-move": ("MEEL MOVE", "A KOMMINENI GROUP COMPANY", "#2A4A73"),
-    "meel-pay": ("MEEL PAY", "A KOMMINENI GROUP COMPANY", "#4E3A6B"),
-    "meel-reach": ("MEEL REACH", "A KOMMINENI GROUP COMPANY", "#8A3A52"),
-    "kommineni-hq": ("KOMMINENI HQ", "A KOMMINENI GROUP COMPANY", "#4A4F58"),
+    "pkomm-group": ("PKOMM GROUP", "A FICTIONAL COMPANY", GOLD),
+    "pkomm-motors": ("PKOMM MOTORS", "A PKOMM GROUP COMPANY", "#7A2E2A"),
+    "pkomm-cart": ("PKOMM CART", "A PKOMM GROUP COMPANY", "#8C5A1E"),
+    # Planned businesses. Add them to ACTIVE when they launch.
+    "pkomm-health": ("PKOMM HEALTH", "A PKOMM GROUP COMPANY", "#2F5D46"),
+    "pkomm-freight": ("PKOMM FREIGHT", "A PKOMM GROUP COMPANY", "#2A4A73"),
+    "pkomm-capital": ("PKOMM CAPITAL", "A PKOMM GROUP COMPANY", "#4E3A6B"),
+    "pkomm-media": ("PKOMM MEDIA", "A PKOMM GROUP COMPANY", "#8A3A52"),
+    "pkomm-hq": ("PKOMM HQ", "A PKOMM GROUP COMPANY", "#4A4F58"),
 }
+ACTIVE = ["pkomm-group", "pkomm-motors", "pkomm-cart"]
 
 LINE = 'fill="none" stroke="{c}" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"'
 GLYPHS = {
-    "meel-motors": '<circle {l} cx="60" cy="60" r="22"/><circle {l} cx="60" cy="60" r="5"/>'
+    "pkomm-motors": '<circle {l} cx="60" cy="60" r="22"/><circle {l} cx="60" cy="60" r="5"/>'
                    '<path {l} d="M60 65 V82 M55.5 58 L39 52 M64.5 58 L81 52"/>',
-    "meel-cart": '<path {l} d="M44 52 H76 L73 82 H47 Z M52 52 V47 A8 8 0 0 1 68 47 V52"/>',
-    "meel-care": '<path {l} d="M55 41 H65 V55 H79 V65 H65 V79 H55 V65 H41 V55 H55 Z"/>',
-    "meel-move": '<path {l} d="M38 60 H81 M71 50 L81 60 L71 70 M38 52 V68"/>',
-    "meel-pay": '<path {l} d="M48 44 H72 L82 56 L60 82 L38 56 Z M38 56 H82 M53 44 L50 56 L60 82 L70 56 L67 44"/>',
-    "meel-reach": '<path {l} d="M60 37 L64.5 55.5 L83 60 L64.5 64.5 L60 83 L55.5 64.5 L37 60 L55.5 55.5 Z"/>',
-    "kommineni-hq": '<path {l} d="M40 50 L60 38 L80 50 Z M46 55 V76 M55 55 V76 M65 55 V76 M74 55 V76 M38 81 H82"/>',
+    "pkomm-cart": '<path {l} d="M44 52 H76 L73 82 H47 Z M52 52 V47 A8 8 0 0 1 68 47 V52"/>',
+    "pkomm-health": '<path {l} d="M55 41 H65 V55 H79 V65 H65 V79 H55 V65 H41 V55 H55 Z"/>',
+    "pkomm-freight": '<path {l} d="M38 60 H81 M71 50 L81 60 L71 70 M38 52 V68"/>',
+    "pkomm-capital": '<path {l} d="M48 44 H72 L82 56 L60 82 L38 56 Z M38 56 H82 M53 44 L50 56 L60 82 L70 56 L67 44"/>',
+    "pkomm-media": '<path {l} d="M60 37 L64.5 55.5 L83 60 L64.5 64.5 L60 83 L55.5 64.5 L37 60 L55.5 55.5 Z"/>',
+    "pkomm-hq": '<path {l} d="M40 50 L60 38 L80 50 Z M46 55 V76 M55 55 V76 M65 55 V76 M74 55 V76 M38 81 H82"/>',
 }
 
 
@@ -58,8 +60,8 @@ def seal(key, accent, dark):
     ink = GOLD if dark else accent
     out = (f'<circle fill="none" stroke="{ring}" stroke-width="1.25" cx="60" cy="60" r="56"/>'
            f'<circle fill="none" stroke="{ring}" stroke-width="0.6" cx="60" cy="60" r="51"/>')
-    if key == "kommineni-group":
-        k, _ = text_path(SERIF_BOLD, "K", 62, 60, 81, 0, IVORY if dark else NAVY, center=True)
+    if key == "pkomm-group":
+        k, _ = text_path(SERIF_BOLD, "P", 62, 60, 81, 0, IVORY if dark else NAVY, center=True)
         return out + k
     return out + GLYPHS[key].replace("{l}", LINE).replace("{c}", ink)
 
@@ -78,7 +80,8 @@ def lockup(key, name, line, accent, dark):
     return svg(w, 120, bg + seal(key, accent, dark) + word + rule + tag, f"{name.title()} logo")
 
 
-for key, (name, line, accent) in ENTITIES.items():
+for key in ACTIVE:
+    name, line, accent = ENTITIES[key]
     d = os.path.join(OUT, key)
     os.makedirs(d, exist_ok=True)
     open(f"{d}/mark.svg", "w").write(svg(120, 120, seal(key, accent, False), f"{name.title()} seal"))

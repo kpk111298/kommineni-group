@@ -1,23 +1,23 @@
 # Brand
 
-Every Kommineni Group business shares one look, so they read as one company. The style is classic and quiet: fine lines, a serif name, navy and antique gold.
+Every Pkomm Group business shares one look, so they read as one company. The style is classic and quiet: fine lines, a serif name, navy and antique gold.
 
 ## The system
 
 - **Seal.** Every mark is a fine double ring: an outer line and a thinner inner line.
-- **Symbol.** One simple line drawing inside the seal, drawn with a thin round stroke. The group's seal holds a serif K instead.
+- **Symbol.** One simple line drawing inside the seal, drawn with a thin round stroke. The group's seal holds a serif P instead.
 - **Accent.** Each division draws its seal in its own deep accent color. The group's seal is gold.
 - **Wordmark.** Cormorant Garamond Medium in capitals, widely spaced, in navy.
-- **Gold rule and endorsement.** A short gold line under the name, then A KOMMINENI GROUP COMPANY in Jost, small and widely spaced. The group reads ILLINOIS · EST. 2026.
+- **Gold rule and endorsement.** A short gold line under the name, then A PKOMM GROUP COMPANY in Jost, small and widely spaced. The group reads A FICTIONAL COMPANY.
 - **On navy.** Every seal turns gold and the name turns ivory.
 
 ## Colors
 
 | Business | Accent | Symbol |
 |---|---|---|
-| Kommineni Group | Gold `#C9AE72` on navy `#0A0D16` | Serif K |
-| Meel Motors | Oxblood `#7A2E2A` | Steering wheel |
-| Meel Cart | Ochre `#8C5A1E` | Shopping bag |
+| Pkomm Group | Gold `#C9AE72` on navy `#0A0D16` | Serif P |
+| Pkomm Motors | Oxblood `#7A2E2A` | Steering wheel |
+| Pkomm Cart | Ochre `#8C5A1E` | Shopping bag |
 
 Gold text on white uses `#8A7344` so it stays readable. Ivory on navy is `#F4F1EA`.
 
