@@ -1,5 +1,14 @@
+# Theme for the Pkomm Motors dashboard. Streamlit Cloud reads this from the repo root.
 [theme]
 base = "light"
-backgroundColor = "#FAFAFA"
-secondaryBackgroundColor = "#F0F0F0"
-textColor = "#1A1A1A"
+primaryColor = "#8A7344"
+backgroundColor = "#FFFFFF"
+secondaryBackgroundColor = "#F7F5F0"
+textColor = "#1B1F2A"
+font = "sans serif"
+
+[server]
+headless = true
+
+[browser]
+gatherUsageStats = false
