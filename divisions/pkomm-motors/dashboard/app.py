@@ -21,7 +21,18 @@ import streamlit as st
 HERE = os.path.dirname(os.path.abspath(__file__))
 sys.path.insert(0, HERE)
 
+import importlib  # noqa: E402
 import pipeline  # noqa: E402
+
+# Streamlit Cloud reruns app.py after a push but can keep an older pipeline
+# module in memory. Reload it if it's missing what this file expects.
+if not hasattr(pipeline, "GOLD"):
+    pipeline = importlib.reload(pipeline)
+
+
+def is_published(run):
+    """Runs made before the quality gate existed have no flag; treat them as not published."""
+    return bool(getattr(run, "published", False))
 SAMPLE_DB = os.path.join(HERE, "..", "pkomm_motors.duckdb")
 BRAND = os.path.join(HERE, "..", "..", "..", "brand", "pkomm-motors")
 REPO = "https://github.com/kpk111298/pkomm-group/blob/main/divisions/pkomm-motors"
@@ -78,7 +89,7 @@ DEFINITIONS = {
 def active_db():
     # A run whose tests failed is held back, so the views keep the last good data.
     run = st.session_state.get("run")
-    return run.db_path if run and run.published else SAMPLE_DB
+    return run.db_path if run and is_published(run) else SAMPLE_DB
 
 
 @st.cache_resource
@@ -236,7 +247,7 @@ def show_login():
 
 def show_bar(user):
     run = st.session_state.get("run")
-    if run and not run.published:
+    if run and not is_published(run):
         fresh = '<span class="pk-fresh held"><i></i>Your run was held back, showing sample data</span>'
     elif run:
         mins = int((time.time() - run.finished_at) // 60)
@@ -466,7 +477,7 @@ def show_salesperson(user, f):
 
 def business_view(user):
     run = st.session_state.get("run")
-    if run and run.published:
+    if run and is_published(run):
         st.markdown(f'<div class="pk-callout">You\'re looking at the data from your own pipeline run '
                     f'(seed {run.seed}). It disappears when you sign out.</div>', unsafe_allow_html=True)
     elif run:
