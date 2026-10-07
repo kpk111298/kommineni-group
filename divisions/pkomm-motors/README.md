@@ -13,7 +13,7 @@ A production grade data engineering portfolio project simulating a 5 location au
 
 Raw transactional data flows through a full medallion architecture bronze ingestion, silver cleaning, gold aggregation and surfaces in a live executive dashboard with role based access control.
 
-**Live Demo** → [View Dashboard](https://pkomm-motors.streamlit.app)
+**Live Demo** → [View Dashboard](https://pkomm-group.streamlit.app)
 
 Login credentials:
 - Executive: `exec001` / `exec001`
