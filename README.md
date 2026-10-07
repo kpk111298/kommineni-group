@@ -9,7 +9,7 @@
 
 Practice projects usually start with clean data. Real jobs don't. So this company makes messy data on purpose: records that arrive late, history that changes, files that break. Each problem gets logged like a work ticket, fixed with free tools, tested, and written up on [pkomm.com/blog](https://pkomm.com/blog).
 
-The businesses, customers and numbers are fictional and simulated. The code, tests and fixes are real. Built by [Prameel Kommineni](https://pkomm.com).
+The businesses, customers and numbers are fictional and simulated. The code, tests and fixes are real.
 
 ## The businesses
 

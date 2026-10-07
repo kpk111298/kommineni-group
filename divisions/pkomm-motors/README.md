@@ -113,11 +113,3 @@ dbt test
 cd ../../dashboard
 streamlit run app.py
 ```
-
----
-
-## Author
-
-**Prameel Kommineni**
-Data Engineer — Snowflake, AWS, Azure, Databricks, dbt
-[LinkedIn](https://linkedin.com/in/pkomm) · [GitHub](https://github.com/kpk111298)
