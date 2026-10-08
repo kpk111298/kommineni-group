@@ -3,19 +3,19 @@
   <img src="../../brand/pkomm-motors/lockup-light.svg" alt="Pkomm Motors" height="72">
 </picture>
 
-# Pkomm Motors — Data Pipeline & Analytics Platform
+# Pkomm Motors
 
-A production grade data engineering portfolio project simulating a 5 location automotive dealership. Built to demonstrate real world skills in data ingestion, transformation, warehousing, and analytics.
+Five fictional car dealerships in Dallas, Chicago, Atlanta, Phoenix and Seattle, with a service bay at each. Part of [Pkomm Group](../../README.md). The data is simulated; the pipeline, tests and dashboard are real.
 
 ---
 
 ## What This Project Does
 
-Raw transactional data flows through a full medallion architecture bronze ingestion, silver cleaning, gold aggregation and surfaces in a live executive dashboard with role based access control.
+Raw dealer files flow through bronze, silver and gold layers into a live dashboard with role-based views. A failing data test stops the business tables from rebuilding, so bad data never reaches the dashboard.
 
-**Live Demo** → [View Dashboard](https://pkomm-group.streamlit.app)
+**Live dashboard:** [pkomm-group.streamlit.app](https://pkomm-group.streamlit.app). Pick Executive, Branch manager or Salesperson, then open How it runs and press Break it.
 
-Login credentials:
+Or sign in by hand:
 - Executive: `exec001` / `exec001`
 - Branch Manager: `mgr001` through `mgr005` / same as username
 - Salesperson: `EMP001` through `EMP020` / same as username
@@ -27,11 +27,12 @@ Login credentials:
 Raw CSV Data
     ↓
 Bronze Layer (DuckDB)
-Raw ingestion with metadata — _ingested_at, _source_file
+Raw ingestion with metadata: _ingested_at, _source_file
     ↓
 Silver Layer (dbt)
 Cleaned, typed, standardized staging models
-17 automated data quality tests (6 more on the gold layer)
+17 data tests (6 more on the gold layer)
+A failing test skips everything downstream (dbt build)
     ↓
 Gold Layer (dbt)
 Business KPI aggregations
@@ -39,7 +40,7 @@ Revenue vs target, leaderboard, inventory, service utilization
     ↓
 Streamlit Dashboard
 Role based access: Executive, Branch Manager, Salesperson
-5 real time filters: date range, location, make, sale type, salesperson
+5 filters: period, branch, make, sale type, salesperson
 ```
 
 ---
@@ -59,25 +60,29 @@ Role based access: Executive, Branch Manager, Salesperson
 
 ## Data Model
 
-**5 source tables** — locations, employees, vehicles, sales_transactions, service_jobs
+**5 source tables**: locations, employees, vehicles, sales_transactions, service_jobs
 
-**5 silver models** — fully typed and tested staging layers
+**5 silver models**: fully typed and tested staging layers
 
 **5 gold models:**
-- `daily_sales_by_location` — revenue and unit trends per branch
-- `salesperson_leaderboard` — ranked performance with commission tracking
-- `revenue_vs_target` — monthly pacing against branch targets
-- `inventory_status` — available stock by make and location
-- `service_center_utilization` — technician efficiency and revenue
+- `daily_sales_by_location`: revenue and unit trends per branch
+- `salesperson_leaderboard`: ranked performance with commission tracking
+- `revenue_vs_target`: monthly pacing against branch targets
+- `inventory_status`: available stock by make and location
+- `service_center_utilization`: technician efficiency and revenue
 
 ---
 
 ## Data Quality
 
-23 automated dbt tests covering:
+23 dbt tests covering:
 - Primary key uniqueness
 - Not null constraints on critical fields
 - Accepted value validation
+
+The pipeline runs as one `dbt build`, so a table is tested before anything that depends on it gets built. If a test fails, the business tables are held back and the dashboard keeps the last good data. The How it runs tab shows this live: Break it plants 15 bad records and you can see which ones cleaning removes and which ones the tests stop.
+
+Write-up: [Bad data will reach your raw layer. It just can't get past it.](https://pkomm.com/blog/stop-bad-data-before-the-dashboard/)
 
 ---
 
@@ -87,7 +92,8 @@ Role based access: Executive, Branch Manager, Salesperson
 - Executive sees all 5 locations with company wide KPIs
 - Branch managers see their location, team, inventory, and service data
 - Salespeople see personal performance, commission, and company ranking
-- All views respond to 5 live filters applied at the SQL level
+- All views respond to 5 filters applied at the SQL level
+- How it runs: rebuild the whole pipeline on the server, plant bad data with Break it, or replay any run by its seed
 
 ---
 
@@ -104,10 +110,9 @@ python data_generator/generate_data.py
 # Ingest to bronze
 python ingestion/ingest_bronze.py
 
-# Run dbt transformations
+# Clean, test and model (tests gate everything downstream)
 cd dbt_project/pkomm_motors
-dbt run
-dbt test
+dbt build
 
 # Launch dashboard
 cd ../../dashboard

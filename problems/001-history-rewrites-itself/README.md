@@ -12,7 +12,7 @@ At a national trucking company, I built raw, cleaned and reporting layers so ana
 The Chicago branch manager: Last Tuesday showed 6 cars sold on Wednesday morning. Today the same Tuesday shows 3. Which number do I report?
 
 ## What is actually wrong
-`divisions/pkomm-motors/data_generator/generate_data.py` uses `random.seed(None)` and rebuilds the last 30 days of sales every run. The daily GitHub Action runs it, then reloads bronze from scratch. So every morning the whole past month is replaced with new random history. Nothing that happened yesterday stays true.
+`divisions/pkomm-motors/data_generator/generate_data.py` uses `random.seed(None)` and rebuilds the last 90 days of sales every run, then bronze is reloaded from scratch. It used to run every morning from a GitHub Action. Now it runs whenever someone presses Run on the dashboard. Either way, the whole past quarter is replaced with new history each time. Nothing that happened yesterday stays true.
 
 ## Why it matters
 Managers lose trust in the dashboard. Monthly targets and commissions depend on the past staying fixed.

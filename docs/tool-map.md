@@ -17,7 +17,7 @@ Python, SQL, PySpark, Bash and YAML.
 | Lakehouse tables | Delta Lake, Apache Iceberg | | S3 Tables, Glue with Iceberg | Fabric OneLake (Delta) | Databricks Delta, Snowflake Iceberg tables |
 | Big batch processing | PySpark | | Glue, EMR | Synapse Spark, Databricks | Databricks, Snowpark |
 | SQL transforms and tests | dbt Core | Yes | dbt on Redshift or Athena | dbt on Synapse or Fabric | dbt on Snowflake or Databricks |
-| Scheduling and orchestration | GitHub Actions, Dagster | GitHub Actions | MWAA (managed Airflow), Step Functions | Data Factory pipelines | Snowflake Tasks, Databricks Jobs |
+| Scheduling and orchestration | GitHub Actions, Dagster | Not yet (runs on demand from the dashboard) | MWAA (managed Airflow), Step Functions | Data Factory pipelines | Snowflake Tasks, Databricks Jobs |
 | Streaming | Redpanda (Kafka compatible) | | Kinesis, MSK | Event Hubs | Snowpipe Streaming |
 | Change data capture | Debezium | | DMS | Data Factory CDC | Snowflake Streams |
 | Data quality | dbt tests, Great Expectations | dbt tests | Glue Data Quality | Purview data quality | Snowflake data metric functions |
